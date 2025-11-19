@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ohana-scs.org/schema/bundle.schema.json",
+  "title": "SCS Bundle",
+  "description": "Schema for SCD Bundles (project-level context contracts).",
+  "type": "object",
+  "required": ["id", "version", "title", "description", "scds", "provenance"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^bundle:[a-zA-Z0-9._-]+$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "imports": {
+      "type": "array",
+      "description": "Optional external bundles or libraries.",
+      "items": {
+        "type": "string",
+        "pattern": "^bundle:[a-zA-Z0-9._:-]+$"
+      }
+    },
+    "scds": {
+      "type": "array",
+      "description": "List of SCD identifiers included in this bundle.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^scd:(meta|standards|project):[a-zA-Z0-9._-]+$"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_by", "created_at"],
+      "properties": {
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_by": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "rationale": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

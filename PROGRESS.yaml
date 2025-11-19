@@ -1,0 +1,42 @@
+# =====================================================================
+# SCS-Spec STATUS CONTEXT (Do Not Remove This Header)
+# =====================================================================
+# This file provides a machine-readable snapshot of the project's
+# current state, priorities, and focus. It is updated continuously.
+#
+# Update Rules:
+#   1. ALWAYS add new updates at the TOP of the file.
+#   2. NEVER rewrite or reorder older entries—append downward.
+#   3. Keep summaries concise, factual, and oriented to action.
+#   4. Agents should treat the topmost block as authoritative.
+#
+# Purpose:
+#   - Provide a single source of truth for "where we are."
+#   - Help humans resume work instantly after context switches.
+#   - Help AI agents align, plan, and reason without re-asking.
+#
+# Structure (Recommended):
+#   - date_block:
+#       timestamp: ISO-8601
+#       summary:    One-sentence context
+#       focus:      Current working area
+#       next_steps: Short actionable list
+#       notes:      Optional—decisions, changes, blockers
+#
+# =====================================================================
+---
+date_block:
+  timestamp: "2025-11-17T18:30:00-05:00"
+  summary: "Repo split complete; beginning spec hardening toward Draft 0.1."
+  focus: "Strengthen Structured Context Specification (Repo: structured-context-spec)"
+  next_steps:
+    - "Validate tier definitions and boundaries for meta-tier, project-tier, and standards-tier."
+    - "Tighten the core model: SCD shape, bundle shape, category taxonomy, identity & references, versioning model, and intent↔SCD↔bundle link semantics."
+    - "Rewrite bundle semantics (v0.2) so bundles reference spec version, list SCDs explicitly, define provenance, optionally reference registry artifacts, and include policy/constraint metadata."
+    - "Revisit JSON schemas so required/optional fields and structures match the clarified spec wording and bundle definition."
+    - "Clarify governance surfaces: describe governance checks, how governance agents operate, which SCDs they consume, and how teams interpret results."
+    - "Produce a high-level Spec Overview diagram tying tiers, SCDs, bundles, registry, tools, and reference implementation together."
+  notes: >
+    Repo split into four repos (spec, registry, reference implementation, tools) is complete.
+    Today’s focus is on stabilizing the core specification so it is usable by the team as Draft 0.1.
+    Registry population and reference implementation refinement will follow after spec hardening.
