@@ -123,7 +123,7 @@ If you are:
 1. **Clone this repo**
 
 ```bash
-git clone https://github.com/<org>/scs-spec.git
+git clone https://github.com/tim-mccrimmon/scs-spec.git
 cd scs-spec
 ```
 
@@ -142,6 +142,6 @@ See docs/validation-workflow.md and tools/scd-validator/README.md for details.
 The current working version of the spec is 0.1 and is still evolving.
 For current focus and next steps, see:
 
-`PROGRESS.yaml'
+`PROGRESS.yaml`
 
 If you have questions, suggestions, or want to collaborate, please open an issue or pull request.
