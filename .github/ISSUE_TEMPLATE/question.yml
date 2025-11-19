@@ -1,0 +1,41 @@
+name: Question / Help
+description: Ask a question about SCS
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question about SCS? We're here to help!
+
+        **Before asking**, please check:
+        - [Documentation](../docs/)
+        - [FAQ](../docs/faq.md)
+        - [Getting Started Guide](../docs/getting-started.md)
+        - [Existing Discussions](https://github.com/your-org/scs-spec/discussions)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: Ask your question here
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to accomplish? Any relevant background?
+      placeholder: Provide context for your question
+    validations:
+      required: false
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What Have You Tried?
+      description: What have you already attempted or researched?
+    validations:
+      required: false

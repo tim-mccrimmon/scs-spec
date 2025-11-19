@@ -1,0 +1,39 @@
+# CODEOWNERS for SCS Specification
+#
+# This file defines who reviews different parts of the repository.
+# On GitHub, these users will be automatically requested for review when
+# a PR touches files matching the patterns below.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything (unless overridden below)
+* @timmccrimmon
+
+# Specification documents - require maintainer review
+/spec/ @timmccrimmon
+
+# Schemas - require maintainer review (critical for validation)
+/schema/ @timmccrimmon
+
+# Governance documents - require maintainer review
+/GOVERNANCE.md @timmccrimmon
+/CODE_OF_CONDUCT.md @timmccrimmon
+/LICENSE.md @timmccrimmon
+
+# RFC process - maintainer decides
+/rfcs/ @timmccrimmon
+
+# Templates can have broader review
+/templates/ @timmccrimmon
+
+# Documentation - can add other reviewers here as team grows
+/docs/ @timmccrimmon
+
+# Examples - can add other reviewers here
+/examples/ @timmccrimmon
+
+# Tools - can add other reviewers here when you have tool contributors
+/tools/ @timmccrimmon
+
+# Configuration and CI - require maintainer review
+/.github/ @timmccrimmon
