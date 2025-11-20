@@ -1,3 +1,35 @@
+Metadata-Version: 2.4
+Name: scs-validator
+Version: 0.1.0
+Summary: Validator for Structured Context Specification (SCS) documents and bundles
+Author-email: Timothy McCrimmon <tim@ohana-consulting.com>
+License: Apache-2.0
+Project-URL: Homepage, https://github.com/tim-mccrimmon/scs-spec
+Project-URL: Repository, https://github.com/tim-mccrimmon/scs-spec
+Project-URL: Issues, https://github.com/tim-mccrimmon/scs-spec/issues
+Keywords: scs,validation,structured-context,ai-native
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Quality Assurance
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jsonschema>=4.20
+Requires-Dist: click>=8.1
+Requires-Dist: colorama>=0.4
+Requires-Dist: tabulate>=0.9
+Requires-Dist: semver>=3.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4; extra == "dev"
+Requires-Dist: pytest-cov>=4.1; extra == "dev"
+Requires-Dist: black>=23.0; extra == "dev"
+Requires-Dist: mypy>=1.7; extra == "dev"
+Requires-Dist: ruff>=0.1; extra == "dev"
+
 # SCD Validator
 
 **Version**: 0.1.0

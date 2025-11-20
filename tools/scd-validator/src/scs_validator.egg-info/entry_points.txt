@@ -1,0 +1,2 @@
+[console_scripts]
+scs-validate = scs_validator.cli:main

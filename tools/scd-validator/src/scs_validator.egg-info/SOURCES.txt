@@ -1,0 +1,16 @@
+README.md
+pyproject.toml
+src/scs_validator/__init__.py
+src/scs_validator/__main__.py
+src/scs_validator/cli.py
+src/scs_validator/parser.py
+src/scs_validator/reporter.py
+src/scs_validator/schema_validator.py
+src/scs_validator/semantic_validator.py
+src/scs_validator/utils.py
+src/scs_validator.egg-info/PKG-INFO
+src/scs_validator.egg-info/SOURCES.txt
+src/scs_validator.egg-info/dependency_links.txt
+src/scs_validator.egg-info/entry_points.txt
+src/scs_validator.egg-info/requires.txt
+src/scs_validator.egg-info/top_level.txt
