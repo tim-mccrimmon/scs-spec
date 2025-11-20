@@ -9,11 +9,11 @@
 AI has entered the software development cycle — but without structured context, it's **ungovernable, untraceable, and legally indefensible**.
 
 **Without structured context:**
-- ❌ You can't prove what context the AI saw when generating code
-- ❌ You can't demonstrate compliance with HIPAA, SOC2, or other regulations
-- ❌ Multiple AI tools (for dev, security, architecture, compliance) produce conflicting outputs
-- ❌ No audit trail connecting decisions to humans
-- ❌ AI-generated code becomes a liability in regulated environments
+- You can't prove what context the AI saw when generating code
+- You can't demonstrate compliance with HIPAA, SOC2, or other regulations
+- Multiple AI tools (for dev, security, architecture, compliance) produce conflicting outputs
+- No audit trail connecting decisions to humans
+- AI-generated code becomes a liability in regulated environments
 
 **In regulated industries (healthcare, finance, government), this makes AI essentially unusable in production systems that matter.**
 
@@ -67,7 +67,7 @@ As teams add AI assistants for development, security, architecture, and complian
 
 **All without meetings.**
 
-### 5. Complete Accountability
+### 5. Transparency by Design
 
 Every SCD includes provenance:
 ```yaml
@@ -76,8 +76,6 @@ provenance:
   created_at: 2025-11-19T10:00:00Z
   rationale: "Changed encryption to AES-256 per CSO requirement for HIPAA"
 ```
-
-**AI can't hide behind "the algorithm." Humans can't claim "nobody told me."**
 
 ---
 
@@ -234,25 +232,25 @@ scs-validate --bundle my-bundle.yaml
 
 ## Key Features
 
-### ✅ Three-Tier Model
+### Three-Tier Model
 Separates universal semantics (meta), external obligations (standards), and project specifics (project)
 
-### ✅ Relationship Graph
+### Relationship Graph
 SCDs form a knowledge graph enabling impact analysis, compliance checking, and dependency tracking
 
-### ✅ Version Control Friendly
+### Version Control Friendly
 YAML/JSON formats work with git, enabling full change history and provenance
 
-### ✅ Autonomic Governance
+### Autonomic Governance
 AI agents operate over bundles to continuously validate compliance and detect issues
 
-### ✅ Shared Standards
+### Shared Standards
 Import standards-tier SCDs from scs-registry instead of reinventing compliance
 
-### ✅ Tool-Friendly
+### Tool-Friendly
 JSON Schemas enable validation, IDE integration, and automated governance
 
-### ✅ Provenance by Design
+### Provenance by Design
 Every SCD tracks who, when, why for complete accountability
 
 ---
