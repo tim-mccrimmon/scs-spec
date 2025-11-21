@@ -1,0 +1,33 @@
+# ================================================================
+# SCS Bundle: Meta-Tier Bundle
+# ================================================================
+# Standard meta-tier bundle provided by SCS specification.
+# Contains foundational vocabulary, roles, capabilities, and concepts
+# that all projects import and reference.
+# ================================================================
+
+id: bundle:meta
+type: meta
+version: "1.0.0"
+title: "SCS Meta-Tier Standard Bundle"
+description: >
+  Standard meta-tier bundle containing foundational vocabulary and semantics
+  for structured context. All SCS projects import this bundle to ensure
+  consistent terminology and role definitions across the ecosystem.
+
+# No imports - meta is the foundation
+imports: []
+
+# Standard meta-tier SCDs
+scds:
+  - scd:meta:roles
+  - scd:meta:capabilities
+  - scd:meta:domains
+  - scd:meta:concerns
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-15T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-15T10:00:00Z"
+  rationale: "SCS 0.1 standard meta-tier bundle - foundational vocabulary for all projects"

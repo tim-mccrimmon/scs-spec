@@ -1,7 +1,7 @@
 # Recommended Project Structure for SCS
 
 **Version**: 0.1
-**Last Updated**: 2025-11-20
+**Last Updated**: 2025-11-21
 
 ---
 
@@ -37,33 +37,37 @@ project-name/
 │   │   └── concerns.yaml
 │   │
 │   ├── standards/                    # Standards-tier SCDs
-│   │   ├── hipaa.yaml
-│   │   ├── soc2.yaml
-│   │   └── iso27001.yaml
+│   │   ├── hipaa-privacy-rule.yaml
+│   │   ├── hipaa-security-rule.yaml
+│   │   └── hipaa-breach-notification.yaml
 │   │
-│   └── project/                      # Project-tier SCDs
+│   └── project/                      # Project-tier SCDs (38+ SCDs)
 │       ├── system-context.yaml
 │       ├── tech-stack.yaml
+│       ├── integration-map.yaml
 │       ├── component-model.yaml
-│       ├── deployment-model.yaml
+│       ├── authn-authz.yaml
+│       ├── data-protection.yaml
+│       ├── data-handling.yaml
 │       ├── threat-model.yaml
-│       ├── security-controls.yaml
-│       ├── auth-model.yaml
-│       ├── decision-framework.yaml
-│       ├── approval-process.yaml
-│       ├── performance-requirements.yaml
-│       ├── test-strategy.yaml
-│       └── ... (more project SCDs)
+│       └── ... (30+ more project SCDs)
 │
-├── bundles/                          # Bundle definitions
-│   ├── project-bundle.yaml           # Master project bundle
+├── bundles/                          # Bundle manifests
+│   ├── project-bundle.yaml           # Top-level project bundle
+│   ├── meta-bundle.yaml              # Meta-tier bundle (imported from SCS)
+│   ├── standards-bundle.yaml         # Standards bundle
 │   │
-│   └── domains/                      # Domain-specific bundles
+│   └── domains/                      # Domain-specific bundles (10 minimum)
 │       ├── architecture.yaml
 │       ├── security.yaml
-│       ├── governance.yaml
-│       ├── performance.yaml
-│       └── compliance.yaml
+│       ├── performance-reliability.yaml
+│       ├── usability-accessibility.yaml
+│       ├── compliance-governance.yaml
+│       ├── data-provenance.yaml
+│       ├── testing-validation.yaml
+│       ├── deployment-operations.yaml
+│       ├── safety-risk.yaml
+│       └── ethics-ai-accountability.yaml
 │
 ├── .scs/                             # SCS configuration (optional)
 │   └── config.yaml
@@ -72,6 +76,35 @@ project-name/
     └── workflows/
         └── validate-scs.yml          # SCS validation workflow
 ```
+
+---
+
+## Bundle Hierarchy
+
+SCS projects organize context using a **4-bundle-type hierarchy**:
+
+```
+Project Bundle (type: project)
+├── Meta Bundle (type: meta)
+├── Standards Bundle (type: standards)
+└── Domain Bundles (type: domain × 10+)
+    ├── Architecture
+    ├── Security
+    ├── Performance & Reliability
+    ├── Usability & Accessibility
+    ├── Compliance & Governance
+    ├── Data & Provenance
+    ├── Testing & Validation
+    ├── Deployment & Operations
+    ├── Safety & Risk
+    └── Ethics & AI Accountability
+```
+
+**Key Rules**:
+- **Project bundle** imports all other bundles (meta, standards, domains)
+- **Meta bundle** contains foundational vocabulary (imported from SCS spec)
+- **Standards bundle** contains compliance requirements
+- **Domain bundles** contain project-tier SCDs (2+ SCDs each, no imports allowed)
 
 ---
 
@@ -84,8 +117,8 @@ project-name/
 **Structure**:
 ```
 context/
-├── meta/          # Meta-tier: System-wide definitions
-├── standards/     # Standards-tier: External standards and regulations
+├── meta/          # Meta-tier: Foundational vocabulary
+├── standards/     # Standards-tier: Compliance and regulatory
 └── project/       # Project-tier: Specific system being built
 ```
 
@@ -106,13 +139,15 @@ context/
 
 ### `/context/meta/` - Meta-Tier SCDs
 
-**Purpose**: Defines universal semantics, vocabulary, and foundational concepts for the system.
+**Purpose**: Defines universal semantics, vocabulary, and foundational concepts. Typically **imported from SCS specification** rather than created from scratch.
 
-**Typical Contents**:
+**Standard Contents** (provided by SCS):
 - `roles.yaml` - System roles and trust levels
 - `capabilities.yaml` - System capabilities
 - `domains.yaml` - Domain concepts and boundaries
 - `concerns.yaml` - Cross-cutting concerns
+
+**Note**: Most projects import the standard meta bundle from SCS rather than defining their own meta-tier SCDs.
 
 **Example SCD Structure**:
 ```yaml
@@ -121,68 +156,54 @@ id: scd:meta:roles
 type: meta
 title: "System Roles"
 version: "1.0.0"
-description: "Defines all roles within the system and their trust levels"
+description: "Standard role definitions for structured context"
 content:
   roles:
     - id: role:admin
       name: "Administrator"
       description: "System administrator with full access"
-      responsibilities:
-        - "Manage system configuration"
-        - "Manage user accounts"
-      trust_level: "high"
     - id: role:user
       name: "Standard User"
       description: "Regular system user"
-      responsibilities:
-        - "Access permitted resources"
-      trust_level: "standard"
 provenance:
-  created_by: "governance-team@company.com"
-  created_at: "2025-11-20T10:00:00Z"
-  rationale: "Initial role definitions for project authorization model"
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-15T10:00:00Z"
+  rationale: "SCS 0.1 standard role definitions"
 ```
 
 ---
 
 ### `/context/standards/` - Standards-Tier SCDs
 
-**Purpose**: Represents external standards, regulations, and compliance requirements.
+**Purpose**: Represents external standards, regulations, and compliance requirements interpreted for the project.
 
 **Typical Contents**:
-- `hipaa.yaml` - HIPAA requirements and controls
-- `soc2.yaml` - SOC2 requirements
-- `gdpr.yaml` - GDPR requirements
-- `iso27001.yaml` - ISO 27001 controls
-- `pci-dss.yaml` - PCI DSS requirements
-- `nist.yaml` - NIST framework controls
+- `hipaa-privacy-rule.yaml` - HIPAA privacy requirements
+- `hipaa-security-rule.yaml` - HIPAA security requirements
+- `soc2-*.yaml` - SOC2 control interpretations
+- `gdpr-*.yaml` - GDPR requirements
+- `pci-dss-*.yaml` - PCI DSS requirements
 
-**Note**: Many standards-tier SCDs may be imported from external bundles (e.g., `scs-registry`) rather than created from scratch.
+**Note**: Some standards may be imported from external bundles (e.g., SOC2) while others are project-specific interpretations (e.g., HIPAA).
 
 **Example SCD Structure**:
 ```yaml
-# context/standards/hipaa.yaml
-id: scd:standards:hipaa-164.312
+# context/standards/hipaa-privacy-rule.yaml
+id: scd:standards:hipaa-privacy-rule
 type: standards
-title: "HIPAA Security Rule - Technical Safeguards"
+title: "HIPAA Privacy Rule Requirements"
 version: "1.0.0"
-description: "HIPAA 164.312 technical safeguard requirements"
+description: "HIPAA Privacy Rule requirements applicable to this project"
 content:
-  standard_name: "HIPAA"
-  standard_version: "164.312"
+  standard_name: "HIPAA Privacy Rule"
   requirements:
-    - id: "164.312(a)(2)(iv)"
-      title: "Encryption and Decryption"
-      description: "Implement a mechanism to encrypt and decrypt electronic protected health information"
-      category: "Access Control"
-    - id: "164.312(d)"
-      title: "Person or Entity Authentication"
-      description: "Implement procedures to verify that a person or entity seeking access to electronic protected health information is the one claimed"
-      category: "Authentication"
+    - id: "164.502(a)"
+      title: "Uses and Disclosures of PHI"
+      description: "A covered entity may not use or disclose PHI except as permitted"
 provenance:
-  created_by: "compliance-team@company.com"
-  created_at: "2025-11-20T10:00:00Z"
-  rationale: "HIPAA technical safeguards applicable to healthcare system"
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-11-01T09:30:00Z"
+  rationale: "HIPAA privacy requirements for medication adherence system"
 ```
 
 ---
@@ -191,33 +212,29 @@ provenance:
 
 **Purpose**: Describes the specific system being built - architecture, features, security implementations, etc.
 
-**Typical Contents** (organized by domain concern):
+**Organization**: 38+ SCDs organized across 10 domain areas (see [Minimum Project SCDs](minimum-project-scds.md) for complete list).
 
-**Architecture**:
+**Example Categories**:
+
+**Architecture** (4 SCDs):
 - `system-context.yaml` - System boundaries and external systems
 - `tech-stack.yaml` - Technology choices and rationale
+- `integration-map.yaml` - External system interfaces
 - `component-model.yaml` - Component structure and interactions
-- `deployment-model.yaml` - Deployment architecture
-- `data-flow.yaml` - Data flow and integration patterns
 
-**Security**:
+**Security** (4 SCDs):
+- `authn-authz.yaml` - Authentication and authorization
+- `data-protection.yaml` - Encryption and key management
+- `data-handling.yaml` - Data classification and retention
 - `threat-model.yaml` - Identified threats and mitigations
-- `security-controls.yaml` - Security control implementations
-- `auth-model.yaml` - Authentication and authorization design
-- `encryption.yaml` - Encryption approach and key management
 
-**Governance**:
-- `decision-framework.yaml` - How decisions are made
-- `approval-process.yaml` - Approval workflows
-- `risk-management.yaml` - Risk identification and management
+**Performance & Reliability** (4 SCDs):
+- `response-time.yaml` - Latency targets and SLOs
+- `availability.yaml` - Uptime targets and redundancy
+- `fault-tolerance.yaml` - Error handling and resilience
+- `scalability.yaml` - Scaling strategy and capacity
 
-**Performance**:
-- `performance-requirements.yaml` - Performance criteria and SLAs
-- `load-expectations.yaml` - Expected load and scaling requirements
-
-**Testing**:
-- `test-strategy.yaml` - Testing approach and coverage
-- `test-environments.yaml` - Test environment definitions
+(See [Minimum Project SCDs](minimum-project-scds.md) for remaining 7 domains with 26+ SCDs)
 
 **Example SCD Structure**:
 ```yaml
@@ -226,136 +243,219 @@ id: scd:project:system-context
 type: project
 title: "System Context and Boundaries"
 version: "1.0.0"
-description: "Defines the system boundary, external systems, and key interactions"
+description: "Defines system boundary, external systems, and key interactions"
 content:
-  system_name: "Healthcare Patient Portal"
+  system_name: "Medication Adherence System"
   system_boundary:
-    description: "Web-based patient portal for accessing medical records"
-    components_inside_boundary:
-      - "Web Frontend"
-      - "API Gateway"
-      - "Backend Services"
+    description: "Mobile app for medication tracking and reminders"
+    components:
+      - "Mobile App (iOS/Android)"
+      - "Backend API"
       - "Database"
+      - "Notification Service"
     external_systems:
       - name: "EHR System"
         interface: "HL7 FHIR API"
-        trust_level: "trusted"
-      - name: "Payment Processor"
-        interface: "REST API"
-        trust_level: "external"
+      - name: "SMS Gateway"
+        interface: "Twilio API"
 relationships:
   - type: depends-on
     target: scd:meta:roles
-    description: "Uses system roles defined in meta tier"
   - type: satisfies
-    target: scd:standards:hipaa-164.312
-    description: "System design satisfies HIPAA technical safeguards"
+    target: scd:standards:hipaa-security-rule
 provenance:
-  created_by: "architecture-team@company.com"
-  created_at: "2025-11-20T10:00:00Z"
-  rationale: "Initial system context for patient portal development"
+  created_by: "architecture-team@medtech.com"
+  created_at: "2025-11-01T10:00:00Z"
+  rationale: "Initial system context for medication adherence system"
 ```
 
 ---
 
-### `/bundles/` - Bundle Definitions
+### `/bundles/` - Bundle Manifests
 
-**Purpose**: Contains bundle manifests that organize and version SCDs.
+**Purpose**: Contains bundle manifests that organize and version SCDs. Bundles are **container documents** (manifests) that reference SCDs but are NOT SCDs themselves.
 
 **Structure**:
 ```
 bundles/
-├── project-bundle.yaml       # Master project bundle
-└── domains/                  # Domain-specific bundles
+├── project-bundle.yaml          # Top-level orchestrator (type: project)
+├── meta-bundle.yaml             # Foundational vocabulary (type: meta)
+├── standards-bundle.yaml        # Compliance requirements (type: standards)
+└── domains/                     # Domain-specific bundles (type: domain)
     ├── architecture.yaml
     ├── security.yaml
-    ├── governance.yaml
-    ├── performance.yaml
-    └── compliance.yaml
+    ├── performance-reliability.yaml
+    ├── usability-accessibility.yaml
+    ├── compliance-governance.yaml
+    ├── data-provenance.yaml
+    ├── testing-validation.yaml
+    ├── deployment-operations.yaml
+    ├── safety-risk.yaml
+    └── ethics-ai-accountability.yaml
 ```
+
+**Bundle Types**: See [Bundle Format Specification](../spec/0.1/bundle-format.md) for complete details.
 
 ---
 
-### `/bundles/project-bundle.yaml` - Master Project Bundle
+### `/bundles/project-bundle.yaml` - Project Bundle
 
-**Purpose**: The **authoritative contract** for the entire project. Imports all domain bundles and defines the complete context.
+**Type**: `project`
+**Purpose**: Top-level orchestrator that imports all other bundles (meta, standards, domains).
 
 **Example Structure**:
 ```yaml
-id: bundle:healthcare-patient-portal
+id: bundle:medication-adherence
+type: project
 version: "1.0.0"
-title: "Healthcare Patient Portal - Complete Context Bundle"
+title: "Medication Adherence System - Complete Context Bundle"
 description: >
-  Complete structured context bundle for the Healthcare Patient Portal project.
-  This bundle represents the v1.0 contract for development and includes all
-  domain-specific contexts (architecture, security, governance, performance, compliance).
+  Complete structured context bundle for the Medication Adherence system.
 
 imports:
+  # Foundation
+  - bundle:meta:1.0.0
+  - bundle:standards:1.0.0
+
+  # Domain bundles (10 prescribed)
   - bundle:architecture:1.0.0
   - bundle:security:1.0.0
-  - bundle:governance:1.0.0
-  - bundle:performance:1.0.0
-  - bundle:compliance:1.0.0
+  - bundle:performance-reliability:1.0.0
+  - bundle:usability-accessibility:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:testing-validation:1.0.0
+  - bundle:deployment-operations:1.0.0
+  - bundle:safety-risk:1.0.0
+  - bundle:ethics-ai-accountability:1.0.0
+
+scds: []  # All SCDs are in imported bundles
+
+provenance:
+  created_by: "project-lead@medtech.com"
+  created_at: "2025-11-01T09:00:00Z"
+  updated_by: "project-lead@medtech.com"
+  updated_at: "2025-11-20T14:00:00Z"
+  rationale: "Version 1.0.0 release - complete context contract for development"
+```
+
+**Notes**:
+- Project bundle typically has empty `scds` array (all context in imported bundles)
+- Imports meta, standards, and all domain bundles
+- Once versioned, this bundle is immutable
+
+---
+
+### `/bundles/meta-bundle.yaml` - Meta Bundle
+
+**Type**: `meta`
+**Purpose**: Standard vocabulary and semantic foundations. Usually **imported from SCS specification** rather than created per-project.
+
+**Example Structure**:
+```yaml
+id: bundle:meta
+type: meta
+version: "1.0.0"
+title: "SCS Meta-Tier Standard Bundle"
+description: >
+  Standard meta-tier bundle containing foundational vocabulary and semantics
+  for structured context. Imported by all SCS projects.
+
+imports: []  # Meta is the foundation - imports nothing
 
 scds:
-  # Meta-tier SCDs (shared across all domains)
   - scd:meta:roles
   - scd:meta:capabilities
   - scd:meta:domains
   - scd:meta:concerns
 
 provenance:
-  created_by: "project-lead@company.com"
-  created_at: "2025-11-20T15:00:00Z"
-  updated_by: "project-lead@company.com"
-  updated_at: "2025-11-20T15:00:00Z"
-  rationale: >
-    Version 1.0 project bundle approved by all domain teams.
-    Represents complete context contract for initial development phase.
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-15T10:00:00Z"
+  rationale: "SCS 0.1 standard meta-tier bundle"
 ```
 
 **Notes**:
-- Project bundle imports domain bundles
-- Meta-tier SCDs typically listed in project bundle (shared foundation)
-- Version represents the contract version, not the software version
-- Once versioned and locked, this file is immutable
+- Provided by SCS specification
+- Projects import this bundle rather than creating their own
+- Contains standard vocabulary all projects use
 
 ---
 
-### `/bundles/domains/` - Domain-Specific Bundles
+### `/bundles/standards-bundle.yaml` - Standards Bundle
 
-**Purpose**: Each domain team maintains a bundle for their specific concern area.
+**Type**: `standards`
+**Purpose**: Compliance and regulatory requirements. May import external standards bundles (e.g., SOC2) and contain project-specific standards SCDs (e.g., HIPAA).
+
+**Example Structure**:
+```yaml
+id: bundle:standards
+type: standards
+version: "1.0.0"
+title: "Medication Adherence System - Standards Bundle"
+description: >
+  Standards and compliance requirements for the Medication Adherence system.
+
+imports:
+  # External standards bundles
+  - bundle:standards:soc2-type2:2023.1
+
+scds:
+  # Project-specific standards interpretations
+  - scd:standards:hipaa-privacy-rule
+  - scd:standards:hipaa-security-rule
+  - scd:standards:hipaa-breach-notification
+
+provenance:
+  created_by: "compliance-team@medtech.com"
+  created_at: "2025-11-01T09:30:00Z"
+  updated_by: "compliance-team@medtech.com"
+  updated_at: "2025-11-15T16:00:00Z"
+  rationale: "Standards bundle for healthcare compliance"
+```
+
+**Notes**:
+- May import external standards bundles (SOC2, ISO27001, etc.)
+- Contains project-specific standards-tier SCDs
+- Flexible structure based on project compliance needs
+
+---
+
+### `/bundles/domains/` - Domain Bundles
+
+**Type**: `domain` (all domain bundles)
+**Purpose**: Each domain bundle contains project-tier SCDs for a specific concern area.
+**Count**: Minimum 10 prescribed domains (projects may add more)
+
+**Key Constraints**:
+- Domain bundles MUST have `imports: []` (no imports allowed)
+- Domain bundles MUST contain at least 2 SCDs
+- Domain bundles contain ONLY project-tier SCDs
 
 #### Architecture Bundle Example
 
 ```yaml
 # bundles/domains/architecture.yaml
 id: bundle:architecture
+type: domain
 version: "1.0.0"
-title: "Architecture Context Bundle"
-description: "Complete architectural context for the Healthcare Patient Portal"
+title: "Medication Adherence System - Architecture Bundle"
+description: "Architecture domain bundle defining system boundaries and components"
+
+imports: []  # Domain bundles cannot import other bundles
 
 scds:
-  # Project-tier SCDs owned by architecture team
   - scd:project:system-context
   - scd:project:tech-stack
+  - scd:project:integration-map
   - scd:project:component-model
-  - scd:project:deployment-model
-  - scd:project:data-flow
-
-relationships:
-  # Domain bundle can declare cross-SCD relationships
-  - type: composition
-    from: scd:project:system-context
-    to: scd:project:component-model
-    description: "System context is decomposed into components"
 
 provenance:
-  created_by: "alice@company.com"
-  created_at: "2025-11-15T10:00:00Z"
-  updated_by: "alice@company.com"
-  updated_at: "2025-11-20T14:00:00Z"
-  rationale: "Architecture context for v1.0 - approved by architecture team"
+  created_by: "architecture-team@medtech.com"
+  created_at: "2025-11-01T10:00:00Z"
+  updated_by: "mike.johnson@medtech.com"
+  updated_at: "2025-11-18T11:30:00Z"
+  rationale: "Architecture bundle v1.0.0 - locked for development"
 ```
 
 #### Security Bundle Example
@@ -363,69 +463,46 @@ provenance:
 ```yaml
 # bundles/domains/security.yaml
 id: bundle:security
+type: domain
 version: "1.0.0"
-title: "Security Context Bundle"
-description: "Complete security context for the Healthcare Patient Portal"
+title: "Medication Adherence System - Security Bundle"
+description: "Security domain bundle defining controls and threat management"
+
+imports: []
 
 scds:
-  # Project-tier SCDs owned by security team
+  - scd:project:authn-authz
+  - scd:project:data-protection
+  - scd:project:data-handling
   - scd:project:threat-model
-  - scd:project:security-controls
-  - scd:project:auth-model
-  - scd:project:encryption
-
-relationships:
-  - type: satisfies
-    from: scd:project:security-controls
-    to: scd:standards:hipaa-164.312
-    description: "Security controls satisfy HIPAA requirements"
 
 provenance:
-  created_by: "bob@company.com"
-  created_at: "2025-11-16T10:00:00Z"
-  updated_by: "bob@company.com"
-  updated_at: "2025-11-20T14:30:00Z"
-  rationale: "Security context for v1.0 - approved by security team"
+  created_by: "security-team@medtech.com"
+  created_at: "2025-11-01T10:15:00Z"
+  updated_by: "rachel.kim@medtech.com"
+  updated_at: "2025-11-19T09:45:00Z"
+  rationale: "Security bundle v1.0.0 - PHI protection controls defined"
 ```
 
-#### Compliance Bundle Example
+**All 10 Prescribed Domain Bundles**:
+1. **Architecture** - System design and technology stack
+2. **Security** - Security controls and data protection
+3. **Performance & Reliability** - Performance targets and resilience
+4. **Usability & Accessibility** - UX principles and WCAG compliance
+5. **Compliance & Governance** - Regulatory mappings and audit requirements
+6. **Data & Provenance** - Data models and lineage tracking
+7. **Testing & Validation** - Test coverage and QA procedures
+8. **Deployment & Operations** - Infrastructure and monitoring
+9. **Safety & Risk** - Risk assessment and safety controls
+10. **Ethics & AI Accountability** - AI usage policy and bias mitigation
 
-```yaml
-# bundles/domains/compliance.yaml
-id: bundle:compliance
-version: "1.0.0"
-title: "Compliance Context Bundle"
-description: "Standards and compliance mappings for Healthcare Patient Portal"
-
-scds:
-  # Standards-tier SCDs (owned by compliance team)
-  - scd:standards:hipaa-164.312
-  - scd:standards:soc2
-
-  # Project-tier SCDs (compliance mappings)
-  - scd:project:hipaa-mappings
-  - scd:project:audit-evidence
-  - scd:project:compliance-controls
-
-relationships:
-  - type: maps-to
-    from: scd:project:hipaa-mappings
-    to: scd:standards:hipaa-164.312
-    description: "Project implementations mapped to HIPAA requirements"
-
-provenance:
-  created_by: "carol@company.com"
-  created_at: "2025-11-17T10:00:00Z"
-  updated_by: "carol@company.com"
-  updated_at: "2025-11-20T13:00:00Z"
-  rationale: "Compliance context for v1.0 - all HIPAA mappings verified"
-```
+See [Minimum Project SCDs](minimum-project-scds.md) for details on SCDs in each domain.
 
 ---
 
 ### `/.scs/` - SCS Configuration (Optional)
 
-**Purpose**: Configuration for SCS tooling. This is optional but useful for customizing tool behavior.
+**Purpose**: Configuration for SCS tooling. Optional but useful for customizing behavior.
 
 **Example Configuration**:
 ```yaml
@@ -436,7 +513,7 @@ version: "0.1"
 paths:
   context_dir: "context"
   bundles_dir: "bundles"
-  schema_dir: "../scs-spec/schema"  # Path to SCS schemas
+  schema_dir: "../scs-spec/schema"
 
 # Naming conventions
 conventions:
@@ -450,11 +527,6 @@ validation:
   strict_versioned: true        # Strict validation for versioned bundles
   check_relationships: true     # Validate relationship targets exist
   check_circular: true          # Check for circular dependencies
-
-# Git integration
-git:
-  tag_versioned_bundles: true   # Automatically tag versioned bundles
-  tag_format: "bundle-v{version}"  # Tag format for bundles
 ```
 
 ---
@@ -486,12 +558,18 @@ SCD ID: scd:project:system-context
 
 ### Bundle Files
 
-**Convention**: `{domain-name}.yaml` for domain bundles, `project-bundle.yaml` for project bundle.
+**Convention**:
+- Project bundle: `project-bundle.yaml`
+- Meta bundle: `meta-bundle.yaml`
+- Standards bundle: `standards-bundle.yaml`
+- Domain bundles: `bundles/domains/{domain-name}.yaml`
 
 **Examples**:
-- `bundles/project-bundle.yaml` - Master project bundle
-- `bundles/domains/architecture.yaml` - Architecture domain bundle
-- `bundles/domains/security.yaml` - Security domain bundle
+- `bundles/project-bundle.yaml`
+- `bundles/meta-bundle.yaml`
+- `bundles/standards-bundle.yaml`
+- `bundles/domains/architecture.yaml`
+- `bundles/domains/security.yaml`
 
 ---
 
@@ -504,10 +582,10 @@ my-application/
 ├── src/                    # Application code
 ├── tests/                  # Application tests
 ├── docs/                   # Application docs
-├── context/                # SCS context
-├── bundles/                # SCS bundles
+├── context/                # SCS context (SCDs)
+├── bundles/                # SCS bundles (manifests)
 ├── .scs/                   # SCS config
-├── package.json            # Node.js example
+├── package.json            # Language-specific config
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
@@ -521,16 +599,34 @@ my-application/
 
 ---
 
+## Container Analogy
+
+SCS bundles work like Docker/Kubernetes containers:
+
+| Docker/K8s | SCS Bundle |
+|------------|------------|
+| Container manifest | Bundle YAML file |
+| `docker-compose.yml` | Project bundle |
+| Base image (`FROM`) | Bundle imports |
+| Layers | SCDs |
+| `:latest` tag | `DRAFT` version |
+| `:1.0.0` tag | Semantic version |
+
+Just as Docker manifests organize layers without being layers themselves, **SCS bundles organize SCDs without being SCDs**.
+
+---
+
 ## Git Workflow
 
 ### Branch Strategy
 
 **DRAFT Bundles** (working state):
 ```
-feature/add-payment-processing
+feature/add-notifications
   ├── Modified: context/project/component-model.yaml
-  ├── Modified: bundles/domains/architecture.yaml (DRAFT)
-  └── Modified: bundles/domains/security.yaml (DRAFT)
+  ├── Modified: context/project/notification-service.yaml (new)
+  ├── Modified: bundles/domains/architecture.yaml (version: "DRAFT")
+  └── Modified: bundles/project-bundle.yaml (version: "DRAFT")
 ```
 
 **Versioned Bundles** (locked state):
@@ -550,7 +646,7 @@ git tag -a bundle-v1.0.0 -m "Project bundle version 1.0.0 - initial contract"
 git push origin bundle-v1.0.0
 ```
 
-**Tag Convention**: `bundle-v{version}` or `bundle-{bundle-name}-v{version}`
+**Tag Convention**: `bundle-v{version}`
 
 ### Pull Request Workflow
 
@@ -560,10 +656,10 @@ git push origin bundle-v1.0.0
 4. Team reviews context changes
 5. Merge to main (still DRAFT)
 6. When ready to version:
-   - Update bundle version numbers
+   - Update bundle version numbers (`DRAFT` → `1.0.0`)
    - Update provenance
    - Create git tag
-   - Lock bundle (prevent further changes to that version)
+   - Bundle becomes immutable
 
 ---
 
@@ -603,26 +699,23 @@ jobs:
 
       - name: Validate domain bundles
         run: |
-          scs-validate --bundle bundles/domains/architecture.yaml
-          scs-validate --bundle bundles/domains/security.yaml
-          scs-validate --bundle bundles/domains/governance.yaml
-          scs-validate --bundle bundles/domains/compliance.yaml
+          scs-validate bundles/domains/*.yaml
 
       - name: Validate project bundle
         run: |
-          scs-validate --bundle bundles/project-bundle.yaml --strict
+          scs-validate bundles/project-bundle.yaml --strict
 
       - name: Generate validation report
         if: always()
         run: |
-          scs-validate --bundle bundles/project-bundle.yaml --output json > validation-report.json
+          scs-validate bundles/project-bundle.yaml --output json > report.json
 
       - name: Upload validation report
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: validation-report
-          path: validation-report.json
+          path: report.json
 ```
 
 ---
@@ -639,100 +732,19 @@ jobs:
 
 **Example Evolution**:
 ```
-v0.1.0 - Initial DRAFT, shared with stakeholders
-v1.0.0 - First locked version, development begins
-v1.1.0 - Added new component (additive change)
-v1.1.1 - Fixed typo in security control description
-v2.0.0 - Major architecture change (breaking change)
+DRAFT - Initial work, shared with stakeholders
+1.0.0 - First locked version, development begins
+1.1.0 - Added notification service (additive change)
+1.1.1 - Fixed typo in security control description
+2.0.0 - Major architecture change (breaking change)
 ```
 
-### Git Tags for Versions
+### Domain Bundle Independence
 
-```bash
-# Version 1.0.0 locked
-git tag -a bundle-v1.0.0 -m "Project bundle v1.0.0"
-git push origin bundle-v1.0.0
-
-# Version 1.1.0 locked
-git tag -a bundle-v1.1.0 -m "Project bundle v1.1.0 - added payment component"
-git push origin bundle-v1.1.0
-```
-
-**Access historical versions**:
-```bash
-# Check out specific bundle version
-git checkout bundle-v1.0.0
-
-# View bundle at that version
-cat bundles/project-bundle.yaml
-```
-
----
-
-## Required vs. Recommended
-
-### Required (Must Follow)
-
-✅ **File Format**: SCDs must be valid YAML or JSON
-✅ **Schema Compliance**: SCDs must validate against tier schemas
-✅ **Bundle Structure**: Bundles must include required fields (id, version, title, description, scds, provenance)
-✅ **ID Format**: SCD IDs must follow `scd:<tier>:<name>` pattern
-
-### Recommended (Should Follow)
-
-💡 **Directory Structure**: Use `/context/` and `/bundles/` organization
-💡 **Naming Convention**: Map SCD IDs to file paths as described
-💡 **Domain Bundles**: Organize by domain concerns
-💡 **Git Tags**: Tag versioned bundles for easy reference
-💡 **CI/CD Validation**: Validate on every PR
-
-### Flexible (May Adapt)
-
-🔧 **Exact directory names**: Can use different names (e.g., `scd/` instead of `context/`)
-🔧 **File organization**: Can organize project-tier SCDs differently
-🔧 **Tool configuration**: Can customize in `.scs/config.yaml`
-🔧 **Bundle granularity**: May have more or fewer domain bundles
-
----
-
-## Adapting the Structure
-
-Teams may adapt this structure if needed. Common adaptations:
-
-### Alternative: Flat Context Structure
-
-```
-context/
-├── roles.yaml                    # Meta-tier
-├── capabilities.yaml             # Meta-tier
-├── hipaa.yaml                    # Standards-tier
-├── system-context.yaml           # Project-tier
-└── tech-stack.yaml               # Project-tier
-```
-
-**Trade-off**: Simpler but harder to navigate with many SCDs
-
-### Alternative: Domain-Oriented Context
-
-```
-context/
-├── architecture/
-│   ├── system-context.yaml
-│   ├── tech-stack.yaml
-│   └── component-model.yaml
-├── security/
-│   ├── threat-model.yaml
-│   └── security-controls.yaml
-└── shared/
-    ├── roles.yaml                # Meta-tier
-    └── hipaa.yaml                # Standards-tier
-```
-
-**Trade-off**: Organized by domain but mixes tiers
-
-### Recommendation
-
-Start with the recommended structure. Adapt only if you have specific needs and understand the trade-offs. Ensure your adaptation is documented in `.scs/config.yaml`.
+Domain bundles MAY version independently:
+- Architecture team locks `bundle:architecture:1.0.0` in Week 3
+- Security team locks `bundle:security:1.0.0` in Week 5
+- Project bundle references specific versions of each
 
 ---
 
@@ -740,41 +752,29 @@ Start with the recommended structure. Adapt only if you have specific needs and 
 
 ```bash
 # 1. Create project structure
-mkdir my-project
-cd my-project
+mkdir my-project && cd my-project
 
 # 2. Create directories
 mkdir -p context/{meta,standards,project}
 mkdir -p bundles/domains
 mkdir -p .scs
 
-# 3. Create initial meta SCD (example)
-cat > context/meta/roles.yaml << 'EOF'
-id: scd:meta:roles
-type: meta
-title: "System Roles"
-version: "0.1.0"
-description: "System role definitions"
-content:
-  roles: []
-provenance:
-  created_by: "you@company.com"
-  created_at: "2025-11-20T10:00:00Z"
-  rationale: "Initial roles definition"
-EOF
+# 3. Copy meta bundle from SCS spec
+cp ../scs-spec/examples/bundles/meta-bundle.yaml bundles/
 
 # 4. Create project bundle
 cat > bundles/project-bundle.yaml << 'EOF'
 id: bundle:my-project
-version: "0.1.0"
+type: project
+version: "DRAFT"
 title: "My Project Context Bundle"
 description: "Complete context for my project"
-imports: []
-scds:
-  - scd:meta:roles
+imports:
+  - bundle:meta:1.0.0
+scds: []
 provenance:
   created_by: "you@company.com"
-  created_at: "2025-11-20T10:00:00Z"
+  created_at: "2025-11-21T10:00:00Z"
   rationale: "Initial project bundle"
 EOF
 
@@ -784,7 +784,7 @@ git add .
 git commit -m "Initial SCS structure"
 
 # 6. Validate
-scs-validate --bundle bundles/project-bundle.yaml
+scs-validate bundles/project-bundle.yaml
 ```
 
 ---
@@ -792,28 +792,29 @@ scs-validate --bundle bundles/project-bundle.yaml
 ## Summary
 
 **Key Principles**:
-1. **Separate concerns**: Context lives in `/context`, bundles in `/bundles`
-2. **Organize by tier**: Meta, standards, and project SCDs in separate directories
-3. **Convention over configuration**: Standard naming maps IDs to paths
-4. **Domain ownership**: Each domain team owns a bundle
-5. **Version control**: Everything in git, tags for versions
-6. **Tool-friendly**: Structure designed for automation
+1. **4 bundle types**: Project, Meta, Standards, Domain
+2. **Bundles are manifests**: They organize SCDs, they're not SCDs themselves
+3. **Hierarchical imports**: Project imports Meta + Standards + Domains
+4. **Domain independence**: Domain bundles can version separately
+5. **Container model**: Like Docker manifests organizing layers
+6. **Immutable contracts**: Once versioned, bundles are locked
 
 **This structure enables**:
 - Clear organization and navigation
-- Tool automation (validators, viewers, AI assistants)
-- Team collaboration (domain bundles)
+- Tool automation (validators, AI assistants)
+- Team collaboration (domain ownership)
 - Version management (git tags)
 - CI/CD integration (validation workflows)
+- Compliance and auditability
 
 ---
 
 ## Related Documentation
 
-- [Bundle Lifecycle](bundle-lifecycle.md) - How bundles evolve through development
 - [Bundle Format Specification](../spec/0.1/bundle-format.md) - Technical bundle structure
+- [Bundle Lifecycle](bundle-lifecycle.md) - How bundles evolve through development
+- [Minimum Project SCDs](minimum-project-scds.md) - Required SCD set (38+ SCDs)
 - [Validation Workflow](validation-workflow.md) - How to validate your structure
-- [Getting Started](getting-started.md) - Create your first SCD
 
 ---
 
@@ -821,4 +822,3 @@ scs-validate --bundle bundles/project-bundle.yaml
 
 - Open an [issue](https://github.com/tim-mccrimmon/scs-spec/issues)
 - Start a [discussion](https://github.com/tim-mccrimmon/scs-spec/discussions)
-- See the [FAQ](faq.md)

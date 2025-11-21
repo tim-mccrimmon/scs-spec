@@ -1,0 +1,47 @@
+# ================================================================
+# SCS Bundle: Medication Adherence System - Project Bundle
+# ================================================================
+# This is the top-level bundle for the Medication Adherence system.
+# It imports the meta bundle, standards bundle, and all domain bundles.
+# This bundle serves as the complete context contract for the project.
+# ================================================================
+
+id: bundle:medication-adherence
+type: project
+version: "1.0.0"
+title: "Medication Adherence System - Complete Context Bundle"
+description: >
+  Complete structured context bundle for the Medication Adherence system.
+  This system helps patients track medication schedules, sends reminders,
+  and provides adherence insights to healthcare providers.
+  Includes all meta-tier, standards-tier, and project-tier context.
+
+# Import foundational bundles
+imports:
+  # Meta-tier: Standard vocabulary and semantics
+  - bundle:meta:1.0.0
+
+  # Standards-tier: Compliance and regulatory requirements
+  - bundle:standards:1.0.0
+
+  # Domain bundles: Project-specific context organized by concern
+  - bundle:architecture:1.0.0
+  - bundle:security:1.0.0
+  - bundle:performance-reliability:1.0.0
+  - bundle:usability-accessibility:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:testing-validation:1.0.0
+  - bundle:deployment-operations:1.0.0
+  - bundle:safety-risk:1.0.0
+  - bundle:ethics-ai-accountability:1.0.0
+
+# This bundle doesn't directly list SCDs - they're all in imported bundles
+scds: []
+
+provenance:
+  created_by: "sarah.chen@medtech.com"
+  created_at: "2025-11-01T09:00:00Z"
+  updated_by: "sarah.chen@medtech.com"
+  updated_at: "2025-11-20T14:00:00Z"
+  rationale: "Version 1.0.0 release - complete context contract for development phase"

@@ -1,7 +1,7 @@
 # Minimum Project-Tier SCDs
 
 **Version**: 0.1
-**Last Updated**: 2025-11-20
+**Last Updated**: 2025-11-21
 
 ---
 
@@ -71,7 +71,9 @@ The minimum set consists of **10 domain bundles**, each containing 2-4 essential
 
 ```
 bundles/
-├── project-bundle.yaml                    # Master bundle (imports all domain bundles)
+├── project-bundle.yaml                    # Top-level bundle (type: project)
+├── meta-bundle.yaml                       # Meta vocabulary (type: meta, imported from SCS)
+├── standards-bundle.yaml                  # Compliance standards (type: standards)
 └── domains/
     ├── architecture.yaml                  # System architecture and design
     ├── security.yaml                      # Security and data protection
@@ -105,12 +107,17 @@ context/project/
 **Contains**:
 ```yaml
 id: bundle:{project-name}
+type: project
 version: "1.0.0"
 title: "{Project Name} Complete Context Bundle"
 description: "Complete structured context for {project-name}"
 
 imports:
-  # Domain bundles
+  # Foundation bundles
+  - bundle:meta:1.0.0
+  - bundle:standards:1.0.0
+
+  # Domain bundles (10 prescribed)
   - bundle:architecture:1.0.0
   - bundle:security:1.0.0
   - bundle:performance-reliability:1.0.0
@@ -122,12 +129,7 @@ imports:
   - bundle:safety-risk:1.0.0
   - bundle:ethics-ai-accountability:1.0.0
 
-scds:
-  # Meta-tier SCDs (imported from scs-spec)
-  - scd:meta:roles
-  - scd:meta:capabilities
-  - scd:meta:domains
-  - scd:meta:concerns
+scds: []  # All SCDs are in imported bundles
 
 provenance:
   created_by: "team-lead@company.com"

@@ -1,7 +1,7 @@
 # Bundle Lifecycle and Workflow
 
 **Version**: 0.1
-**Last Updated**: 2025-11-20
+**Last Updated**: 2025-11-21
 
 ---
 
@@ -236,14 +236,16 @@ When a bundle is versioned and locked:
 
 ```yaml
 id: bundle:architecture
+type: domain
 version: "1.0.0"
 title: "Architecture Bundle"
 description: "Complete architectural context for Project X"
+imports: []  # Domain bundles cannot import other bundles
 scds:
-  - scd:project:system-context:1.0.0
-  - scd:project:tech-stack:1.0.0
-  - scd:project:component-model:1.0.0
-  - scd:project:deployment-model:1.0.0
+  - scd:project:system-context
+  - scd:project:tech-stack
+  - scd:project:integration-map
+  - scd:project:component-model
 provenance:
   created_by: "alice@company.com"
   created_at: "2025-11-20T10:00:00Z"
@@ -254,15 +256,27 @@ provenance:
 
 ```yaml
 id: bundle:project-x
+type: project
 version: "1.0.0"
 title: "Project X Complete Context Bundle"
 description: "Complete context contract for Project X development"
 imports:
+  # Foundation bundles
+  - bundle:meta:1.0.0
+  - bundle:standards:1.0.0
+
+  # Domain bundles (10 prescribed)
   - bundle:architecture:1.0.0
   - bundle:security:1.0.0
-  - bundle:governance:1.0.0
-  - bundle:performance:1.0.0
-  - bundle:compliance:1.0.0
+  - bundle:performance-reliability:1.0.0
+  - bundle:usability-accessibility:1.0.0
+  - bundle:compliance-governance:1.0.0
+  - bundle:data-provenance:1.0.0
+  - bundle:testing-validation:1.0.0
+  - bundle:deployment-operations:1.0.0
+  - bundle:safety-risk:1.0.0
+  - bundle:ethics-ai-accountability:1.0.0
+scds: []  # All SCDs are in imported bundles
 provenance:
   created_by: "project-lead@company.com"
   created_at: "2025-11-20T14:00:00Z"
@@ -283,20 +297,32 @@ Once versioned:
 
 ### Compositional Structure
 
-SCS bundles are **hierarchical and compositional**:
+SCS bundles are **hierarchical and compositional** with **4 bundle types**:
 
 ```
-Project Bundle (top-level contract)
-  ├─ Architecture Bundle:1.0.0
-  │   ├─ scd:project:system-context:1.0.0
-  │   ├─ scd:project:tech-stack:1.0.0
-  │   ├─ scd:project:component-model:1.0.0
-  │   └─ scd:project:deployment-model:1.0.0
+Project Bundle (type: project, top-level orchestrator)
   │
-  ├─ Security Bundle:1.0.0
-  │   ├─ scd:project:threat-model:1.0.0
-  │   ├─ scd:project:security-controls:1.0.0
-  │   └─ scd:project:auth-model:1.0.0
+  ├─ Meta Bundle:1.0.0 (type: meta, foundational vocabulary)
+  │   ├─ scd:meta:roles
+  │   ├─ scd:meta:capabilities
+  │   ├─ scd:meta:domains
+  │   └─ scd:meta:concerns
+  │
+  ├─ Standards Bundle:1.0.0 (type: standards, compliance)
+  │   ├─ scd:standards:hipaa-privacy-rule
+  │   └─ scd:standards:hipaa-security-rule
+  │
+  ├─ Architecture Bundle:1.0.0 (type: domain)
+  │   ├─ scd:project:system-context
+  │   ├─ scd:project:tech-stack
+  │   ├─ scd:project:integration-map
+  │   └─ scd:project:component-model
+  │
+  ├─ Security Bundle:1.0.0 (type: domain)
+  │   ├─ scd:project:authn-authz
+  │   ├─ scd:project:data-protection
+  │   ├─ scd:project:data-handling
+  │   └─ scd:project:threat-model
   │
   ├─ Governance Bundle:1.0.0
   │   ├─ scd:meta:roles:1.0.0
