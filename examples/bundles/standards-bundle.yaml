@@ -8,7 +8,7 @@
 
 id: bundle:standards
 type: standards
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Standards Bundle"
 description: >
   Standards and compliance requirements bundle for the Medication Adherence system.

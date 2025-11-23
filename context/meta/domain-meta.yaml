@@ -1,0 +1,227 @@
+# ================================================================
+# META SCD: DOMAIN-META
+# ================================================================
+# Defines the 10 prescribed domains that organize project-tier SCDs
+# and ensure comprehensive system coverage.
+# ================================================================
+
+id: scd:meta:domain-meta
+type: meta
+title: "Domain Organization and Prescribed Domains"
+version: "0.1.0"
+description: >
+  Defines the concept of domains in SCS, the 10 prescribed domains that
+  production projects MUST include, what each domain covers, and when to
+  add additional domains.
+
+content:
+  definition:
+    what: >
+      Domains are organizational categories that group related concerns and
+      context. SCS prescribes 10 minimum domains that production projects
+      MUST include to ensure comprehensive system coverage.
+    purpose: >
+      Domains provide a structured way to organize project-tier SCDs, enable
+      parallel team development, and ensure no critical concerns are overlooked.
+    domain_bundles: >
+      Each domain is represented by a domain bundle containing 2+ project-tier SCDs
+      that address that domain's concerns.
+
+  prescribed_domains:
+    - id: domain:architecture
+      name: "Architecture"
+      description: >
+        System structure, components, boundaries, and technical design.
+        Covers overall system organization and how pieces fit together.
+      typical_scds:
+        - "System context and boundaries"
+        - "Technology stack"
+        - "Component model"
+        - "Integration map"
+      key_concerns:
+        - "System boundaries"
+        - "Component relationships"
+        - "Technology choices"
+        - "Integration patterns"
+
+    - id: domain:security
+      name: "Security"
+      description: >
+        Security architecture, threat models, authentication, authorization,
+        data protection, and vulnerability management.
+      typical_scds:
+        - "Authentication and authorization"
+        - "Data protection"
+        - "Threat model"
+        - "Security controls"
+      key_concerns:
+        - "Authentication/Authorization"
+        - "Data encryption"
+        - "Threat mitigation"
+        - "Access control"
+
+    - id: domain:performance-reliability
+      name: "Performance & Reliability"
+      description: >
+        Performance requirements, reliability targets, scalability, availability,
+        disaster recovery, and system resilience.
+      typical_scds:
+        - "Performance requirements"
+        - "Scalability approach"
+        - "Availability targets"
+        - "Disaster recovery plan"
+      key_concerns:
+        - "Response times"
+        - "Throughput"
+        - "Uptime targets"
+        - "Fault tolerance"
+
+    - id: domain:usability-accessibility
+      name: "Usability & Accessibility"
+      description: >
+        User experience, interface design, accessibility requirements,
+        and human-computer interaction patterns.
+      typical_scds:
+        - "User experience approach"
+        - "Accessibility requirements"
+        - "Interface patterns"
+        - "User workflows"
+      key_concerns:
+        - "User experience"
+        - "Accessibility standards"
+        - "Inclusive design"
+        - "Usability testing"
+
+    - id: domain:compliance-governance
+      name: "Compliance & Governance"
+      description: >
+        Regulatory compliance, audit requirements, governance policies,
+        and how standards are satisfied in the implementation.
+      typical_scds:
+        - "Compliance mapping"
+        - "Audit requirements"
+        - "Governance policies"
+        - "Evidence collection"
+      key_concerns:
+        - "Regulatory compliance"
+        - "Audit trails"
+        - "Policy enforcement"
+        - "Standards satisfaction"
+
+    - id: domain:data-provenance
+      name: "Data & Provenance"
+      description: >
+        Data models, data flow, data governance, provenance tracking,
+        and data lifecycle management.
+      typical_scds:
+        - "Data model"
+        - "Data flow"
+        - "Data governance"
+        - "Provenance tracking"
+      key_concerns:
+        - "Data models"
+        - "Data lineage"
+        - "Data quality"
+        - "Provenance"
+
+    - id: domain:testing-validation
+      name: "Testing & Validation"
+      description: >
+        Testing strategy, validation approach, quality assurance,
+        and verification methods.
+      typical_scds:
+        - "Testing strategy"
+        - "Test coverage requirements"
+        - "Validation approach"
+        - "QA processes"
+      key_concerns:
+        - "Test coverage"
+        - "Validation methods"
+        - "Quality gates"
+        - "CI/CD testing"
+
+    - id: domain:deployment-operations
+      name: "Deployment & Operations"
+      description: >
+        Deployment strategy, operational procedures, monitoring,
+        incident response, and maintenance.
+      typical_scds:
+        - "Deployment strategy"
+        - "Monitoring approach"
+        - "Incident response"
+        - "Operations runbook"
+      key_concerns:
+        - "Deployment pipeline"
+        - "Monitoring"
+        - "Incident management"
+        - "Operational excellence"
+
+    - id: domain:safety-risk
+      name: "Safety & Risk"
+      description: >
+        Safety requirements, risk assessment, hazard analysis,
+        and risk mitigation strategies.
+      typical_scds:
+        - "Risk assessment"
+        - "Safety requirements"
+        - "Hazard analysis"
+        - "Risk mitigation"
+      key_concerns:
+        - "Safety-critical functions"
+        - "Risk assessment"
+        - "Hazard mitigation"
+        - "Safety validation"
+
+    - id: domain:ethics-ai-accountability
+      name: "Ethics & AI Accountability"
+      description: >
+        Ethical considerations, AI/ML governance, bias mitigation,
+        explainability, and accountability mechanisms.
+      typical_scds:
+        - "AI ethics framework"
+        - "Bias mitigation"
+        - "Explainability approach"
+        - "Accountability mechanisms"
+      key_concerns:
+        - "Ethical AI use"
+        - "Bias detection/mitigation"
+        - "Explainability"
+        - "Human oversight"
+
+  domain_bundle_requirements:
+    minimum_domains: 10
+    minimum_scds_per_domain: 1
+    import_constraint: "Domain bundles MUST NOT import other bundles (imports: [])"
+    scd_tier_constraint: "Domain bundles contain only project-tier SCDs"
+    versioning: "Domain bundles MAY version independently"
+
+  when_to_add_domains:
+    guidance: >
+      Projects MAY add additional domain bundles beyond the prescribed 10
+      when they have domain-specific concerns not covered by the standard set.
+    examples:
+      - "Healthcare: Clinical workflows domain"
+      - "Finance: Trading systems domain"
+      - "IoT: Device management domain"
+      - "Gaming: Game mechanics domain"
+
+  domain_organization:
+    bundle_location: "bundles/domains/"
+    bundle_naming: "bundle:<domain-name>"
+    scd_location: "context/project/"
+    parallel_development: "Domain teams can work independently and version separately"
+
+relationships:
+  - type: extends
+    target: scd:meta:bundle-meta
+    description: "Domains are organized using domain bundles defined in BUNDLE-META"
+
+provenance:
+  created_by: "scs-spec-maintainers@ohana.ai"
+  created_at: "2025-01-23T10:00:00Z"
+  updated_by: "scs-spec-maintainers@ohana.ai"
+  updated_at: "2025-01-23T10:00:00Z"
+  rationale: >
+    Foundational META SCD defining the 10 prescribed domains that ensure
+    comprehensive system coverage. These domains provide the organizational
+    structure for project-tier SCDs and enable parallel team development.

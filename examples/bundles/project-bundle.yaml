@@ -8,7 +8,7 @@
 
 id: bundle:medication-adherence
 type: project
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Complete Context Bundle"
 description: >
   Complete structured context bundle for the Medication Adherence system.
@@ -19,22 +19,22 @@ description: >
 # Import foundational bundles
 imports:
   # Meta-tier: Standard vocabulary and semantics
-  - bundle:meta:1.0.0
+  - bundle:meta:0.1.0
 
   # Standards-tier: Compliance and regulatory requirements
-  - bundle:standards:1.0.0
+  - bundle:standards:0.1.0
 
   # Domain bundles: Project-specific context organized by concern
-  - bundle:architecture:1.0.0
-  - bundle:security:1.0.0
-  - bundle:performance-reliability:1.0.0
-  - bundle:usability-accessibility:1.0.0
-  - bundle:compliance-governance:1.0.0
-  - bundle:data-provenance:1.0.0
-  - bundle:testing-validation:1.0.0
-  - bundle:deployment-operations:1.0.0
-  - bundle:safety-risk:1.0.0
-  - bundle:ethics-ai-accountability:1.0.0
+  - bundle:architecture:0.1.0
+  - bundle:security:0.1.0
+  - bundle:performance-reliability:0.1.0
+  - bundle:usability-accessibility:0.1.0
+  - bundle:compliance-governance:0.1.0
+  - bundle:data-provenance:0.1.0
+  - bundle:testing-validation:0.1.0
+  - bundle:deployment-operations:0.1.0
+  - bundle:safety-risk:0.1.0
+  - bundle:ethics-ai-accountability:0.1.0
 
 # This bundle doesn't directly list SCDs - they're all in imported bundles
 scds: []

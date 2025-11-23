@@ -7,7 +7,7 @@
 
 id: bundle:testing-validation
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Testing & Validation Bundle"
 description: >
   Testing and validation domain bundle defining test coverage targets,

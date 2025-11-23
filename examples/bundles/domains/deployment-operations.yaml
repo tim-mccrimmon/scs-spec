@@ -7,7 +7,7 @@
 
 id: bundle:deployment-operations
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Deployment & Operations Bundle"
 description: >
   Deployment and operations domain bundle defining infrastructure,

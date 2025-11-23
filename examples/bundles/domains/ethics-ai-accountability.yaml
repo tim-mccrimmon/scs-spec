@@ -7,7 +7,7 @@
 
 id: bundle:ethics-ai-accountability
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Ethics & AI Accountability Bundle"
 description: >
   Ethics and AI accountability domain bundle defining AI usage policies,

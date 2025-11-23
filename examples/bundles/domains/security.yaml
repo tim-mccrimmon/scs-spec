@@ -7,7 +7,7 @@
 
 id: bundle:security
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Security Bundle"
 description: >
   Security domain bundle defining authentication, authorization, encryption,

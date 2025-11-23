@@ -7,7 +7,7 @@
 
 id: bundle:compliance-governance
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Compliance & Governance Bundle"
 description: >
   Compliance and governance domain bundle mapping system controls to

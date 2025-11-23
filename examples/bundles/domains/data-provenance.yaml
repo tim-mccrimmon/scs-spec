@@ -7,7 +7,7 @@
 
 id: bundle:data-provenance
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Data & Provenance Bundle"
 description: >
   Data and provenance domain bundle defining data models, lineage tracking,

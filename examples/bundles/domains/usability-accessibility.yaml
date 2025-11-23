@@ -7,7 +7,7 @@
 
 id: bundle:usability-accessibility
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Usability & Accessibility Bundle"
 description: >
   Usability and accessibility domain bundle defining UX principles,

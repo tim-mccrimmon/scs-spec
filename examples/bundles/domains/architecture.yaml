@@ -7,7 +7,7 @@
 
 id: bundle:architecture
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Architecture Bundle"
 description: >
   Architecture domain bundle defining system boundaries, components,

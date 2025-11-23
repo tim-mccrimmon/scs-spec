@@ -7,7 +7,7 @@
 
 id: bundle:performance-reliability
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Performance & Reliability Bundle"
 description: >
   Performance and reliability domain bundle defining response time targets,

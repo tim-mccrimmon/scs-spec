@@ -7,7 +7,7 @@
 
 id: bundle:safety-risk
 type: domain
-version: "1.0.0"
+version: "0.1.0"
 title: "Medication Adherence System - Safety & Risk Bundle"
 description: >
   Safety and risk domain bundle identifying risks, safety concerns,
