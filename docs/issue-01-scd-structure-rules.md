@@ -143,6 +143,48 @@ The **SCD-META** specification defines fundamental rules about how SCDs are stru
 - How do we ensure SCD versions are compatible?
 - What's the relationship between bundle version and SCD versions?
 
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### 1. ID Pattern Enforcement - STRICT
+**Decision**: Enforce pattern `^scd:(meta|standards|project):[a-zA-Z0-9._-]+$` strictly with no exceptions.
+- Validator will reject any SCD that doesn't match this pattern
+- Organizational prefixes (e.g., `scd:meta:acme.roles`) are supported via the name portion
+- Can be reconsidered based on community feedback if edge cases emerge
+
+### 2. Type-Tier Matching - STRICT
+**Decision**: The `type` field MUST match the tier in the `id` field. No exceptions.
+- Validator will reject SCDs where type doesn't match tier
+- Prevents confusion and ensures consistency
+- Alternative of removing `type` field can be considered in future versions
+
+### 3. Immutability - ENFORCED
+**Decision**: Once an SCD is versioned (e.g., `1.0.0`), it is immutable.
+- Changes require creating a new version
+- Immutability is enforced through git workflow and tooling
+- Validator ensures versioned SCDs pass strict validation
+
+### 4. Semver vs. DRAFT - STRICT DICHOTOMY
+**Decision**: Version field must be either `DRAFT` or strict semver (`X.Y.Z`).
+- Pre-release versions (e.g., `1.0.0-beta.1`) are NOT supported in v0.1
+- No intermediate states beyond DRAFT and versioned
+- Pattern: `^(\d+\.\d+\.\d+|DRAFT)$`
+- Can add pre-release support in future if community needs it
+
+### 5. Independent Versioning - CONFIRMED
+**Decision**: SCDs version independently of bundles and other SCDs.
+- Already implemented in current specification
+- Each SCD has its own version lifecycle
+- Bundle version is separate from contained SCD versions
+
+**Implementation Impact**: All decisions above are implemented in validator rules and will be enforced during validation.
+
+---
+
 ## How to Provide Feedback
 
 Please comment with:

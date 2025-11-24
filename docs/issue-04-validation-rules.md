@@ -272,6 +272,206 @@ The **VALIDATOR-META** specification defines 6 levels of validation and when/how
 - Redundant work
 - More CI/CD time
 
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### 1. Compliance Validation Severity (Level 6) - CONFIGURABLE
+
+**Decision**: Compliance validation severity is configurable in completeness-rules.yaml
+
+```yaml
+# completeness-rules.yaml
+compliance_validation:
+  severity: "error"  # or "warning" or "info"
+  check_standards_satisfaction: true
+  require_all_standards_satisfied: true
+```
+
+**Default**: ERROR (strict for production)
+**Projects can override**: Set to "warning" for experiments/POCs
+
+**Rationale**: Different projects have different compliance needs. Healthcare/finance need ERROR, experimental projects need WARNING.
+
+**Validator behavior**: Loads severity from rules file, applies accordingly
+
+---
+
+### 2. Additional Validation Levels - KEEP 6 LEVELS
+
+**Decision**: Keep the current 6 validation levels. No additional levels for v0.1.
+
+**The 6 levels:**
+1. Syntactic - YAML/JSON validation
+2. Schema - JSON Schema validation
+3. Semantic - Logical consistency
+4. Relationship - Relationship validation
+5. Bundle - Bundle completeness
+6. Compliance - Standards satisfaction
+
+**Deferred**: Security validation, consistency validation, performance validation
+- Can be added in future versions
+- Can be separate tools (linters, security scanners)
+
+**Rationale**: 6 levels are comprehensive. Don't expand scope for v0.1.
+
+---
+
+### 3. DRAFT Mode Permissiveness - MODERATELY PERMISSIVE
+
+**Decision**: DRAFT mode is more permissive but still validates structure.
+
+**DRAFT mode behavior:**
+- ✅ Still validates: Syntax (Level 1), Schema (Level 2), Semantic (Level 3)
+- ⚠️ Warns instead of errors: Incomplete relationships (Level 4)
+- ⚠️ Warns instead of errors: Incomplete bundles (Level 5)
+- ⏭️ Skips by default: Completeness validation (Level 6) unless explicitly enabled
+
+**VERSIONED mode behavior:**
+- All levels run with strict ERROR severity
+
+**Rationale**: Catch structural problems early, but allow iteration on completeness
+
+**Validator flags:**
+```bash
+# DRAFT bundle - permissive
+scs-validate --bundle draft-bundle.yaml
+
+# Force strict even for DRAFT
+scs-validate --bundle draft-bundle.yaml --strict
+
+# VERSIONED bundle - always strict
+scs-validate --bundle versioned-bundle.yaml
+```
+
+---
+
+### 4. Validation Order - SEQUENTIAL WITH DEPENDENCIES
+
+**Decision**: Validation levels run sequentially with smart dependency handling.
+
+**Execution order:**
+```
+Level 1 (Syntax) → MUST pass before proceeding
+  ↓
+Level 2 (Schema) → MUST pass before proceeding
+  ↓
+Level 3 (Semantic) + Level 4 (Relationship) → Can run concurrently
+  ↓
+Level 5 (Bundle) → Requires 1-4 to pass
+  ↓
+Level 6 (Completeness) → Requires 5 to pass
+```
+
+**Error reporting per level:**
+- Show ALL errors found in each level
+- Stop at first failing level
+- Don't proceed to next level if current fails
+
+**Rationale**: Logical progression, fail fast, but show complete picture per level
+
+---
+
+### 5. Context Modes - UNIFORM WITH FLAGS
+
+**Decision**: Single validation mode, controlled by command-line flags.
+
+**No context-specific modes** (no --mode dev, --mode ci, etc.)
+
+**Control strictness via flags:**
+```bash
+# Standard validation
+scs-validate --bundle bundle.yaml
+
+# Skip completeness
+scs-validate --bundle bundle.yaml --skip-completeness
+
+# Extra strict (warnings become errors)
+scs-validate --bundle bundle.yaml --strict
+
+# Custom rules
+scs-validate --bundle bundle.yaml --completeness-rules my-rules.yaml
+```
+
+**Rationale**: Simpler for v0.1. Users control behavior explicitly. Can add context modes later if needed.
+
+---
+
+### 6. Error Reporting - ALL ERRORS PER LEVEL
+
+**Decision**: Show all errors within each level, stop at first failing level.
+
+**Behavior:**
+```
+✗ Level 1: Syntax validation failed
+  - file1.yaml:5 - Invalid YAML: unexpected token
+  - file2.yaml:12 - Invalid YAML: unclosed quote
+
+(Validation stops here - don't proceed to Level 2)
+
+Summary: 2 errors in Level 1
+Status: FAILED
+```
+
+vs. if Level 1 passes:
+
+```
+✓ Level 1: Syntax validation passed
+✗ Level 2: Schema validation failed
+  - scd:project:auth - Missing required field: 'version'
+  - scd:project:api - Type 'meta' does not match tier 'project' in ID
+  - scd:project:data - Invalid ID pattern
+
+(Validation stops here - don't proceed to Level 3)
+
+Summary: 3 errors in Level 2
+Status: FAILED
+```
+
+**Rationale**: Complete picture per level helps developers fix multiple issues at once, but logical progression prevents cascading errors
+
+---
+
+### 7. Validation Caching - SKIP FOR v0.1
+
+**Decision**: No validation caching in v0.1. Re-validate on every run.
+
+**Rationale**:
+- Adds complexity (cache invalidation is hard)
+- Files change frequently during development
+- Performance is acceptable for most projects
+- Can add in future if performance becomes issue
+
+**Deferred**: File-based caching, incremental validation
+
+---
+
+### Summary: Validation Behavior for v0.1
+
+**Implemented:**
+1. ✅ 6 validation levels (syntactic → schema → semantic → relationship → bundle → compliance)
+2. ✅ Sequential execution with smart dependencies
+3. ✅ All errors shown per level, stop at first failing level
+4. ✅ DRAFT mode: moderately permissive (structural errors, completeness warnings)
+5. ✅ VERSIONED mode: strict (all errors)
+6. ✅ Configurable compliance severity via rules file
+7. ✅ Uniform validation controlled by flags (--strict, --skip-completeness, etc.)
+8. ✅ No caching (validate every run)
+
+**Validator flags:**
+```bash
+scs-validate --bundle <path>                    # Standard validation
+scs-validate --bundle <path> --strict          # Warnings become errors
+scs-validate --bundle <path> --skip-completeness  # Skip Level 6
+scs-validate --bundle <path> --completeness-rules <path>  # Custom rules
+scs-validate --bundle <path> --output json     # JSON output for CI/CD
+```
+
+---
+
 ## How to Provide Feedback
 
 Please comment with:

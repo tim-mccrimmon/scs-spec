@@ -6,14 +6,23 @@ from typing import Any, Dict
 
 import semver
 
+from .rules_loader import RulesLoader
 from .utils import ValidationError, ValidationResult, ValidationWarning, get_tier_from_id
 
 
 class SemanticValidator:
     """Validator for semantic consistency of SCDs."""
 
-    @staticmethod
-    def validate_scd(scd: Dict[str, Any], file_path: str | None = None) -> ValidationResult:
+    def __init__(self, rules_loader: RulesLoader):
+        """Initialize semantic validator.
+
+        Args:
+            rules_loader: Rules loader instance
+        """
+        self.rules_loader = rules_loader
+        self.rules = rules_loader.load_scd_rules()
+
+    def validate_scd(self, scd: Dict[str, Any], file_path: str | None = None) -> ValidationResult:
         """Validate semantic consistency of an SCD.
 
         Args:
@@ -29,27 +38,27 @@ class SemanticValidator:
         scd_type = scd.get("type")
 
         # Validate type matches tier in ID
-        SemanticValidator._validate_type_tier_match(scd_id, scd_type, result, file_path)
+        self._validate_type_tier_match(scd_id, scd_type, result, file_path)
 
-        # Validate version is valid semver
+        # Validate version is valid semver or DRAFT
         version = scd.get("version")
         if version:
-            SemanticValidator._validate_version(version, scd_id, result, file_path)
+            self._validate_version(version, scd_id, result, file_path)
 
         # Validate provenance
         provenance = scd.get("provenance", {})
-        SemanticValidator._validate_provenance(provenance, scd_id, result, file_path)
+        self._validate_provenance(provenance, scd_id, result, file_path)
 
         # Validate ID format
-        SemanticValidator._validate_id_format(scd_id, result, file_path)
+        self._validate_id_format(scd_id, result, file_path)
 
         # Validate required string fields are not empty
-        SemanticValidator._validate_required_strings(scd, scd_id, result, file_path)
+        self._validate_required_strings(scd, scd_id, result, file_path)
 
         return result
 
-    @staticmethod
     def _validate_type_tier_match(
+        self,
         scd_id: str,
         scd_type: str | None,
         result: ValidationResult,
@@ -80,25 +89,40 @@ class SemanticValidator:
                 )
             )
 
-    @staticmethod
     def _validate_version(
-        version: str, scd_id: str, result: ValidationResult, file_path: str | None
+        self, version: str, scd_id: str, result: ValidationResult, file_path: str | None
     ) -> None:
-        """Validate version follows semantic versioning."""
-        try:
-            # Try to parse as semver
-            semver.VersionInfo.parse(version)
-        except ValueError as e:
-            result.add_error(
-                ValidationError(
-                    f"Version '{version}' is not valid semantic versioning: {e}",
-                    scd_id=scd_id,
-                    file_path=file_path,
+        """Validate version follows semantic versioning or is DRAFT."""
+        # Check against version pattern from rules
+        version_pattern = self.rules.get("version_pattern", {}).get("pattern")
+        if version_pattern:
+            if not re.match(version_pattern, version):
+                error_msg = self.rules_loader.get_error_message(
+                    self.rules,
+                    "invalid_version_format",
+                    version=version,
+                    pattern=version_pattern,
                 )
-            )
+                result.add_error(
+                    ValidationError(error_msg, scd_id=scd_id, file_path=file_path)
+                )
+                return
 
-    @staticmethod
+        # If not DRAFT, validate as semver
+        if version != "DRAFT":
+            try:
+                semver.VersionInfo.parse(version)
+            except ValueError as e:
+                result.add_error(
+                    ValidationError(
+                        f"Version '{version}' is not valid semantic versioning: {e}",
+                        scd_id=scd_id,
+                        file_path=file_path,
+                    )
+                )
+
     def _validate_provenance(
+        self,
         provenance: Dict[str, Any],
         scd_id: str,
         result: ValidationResult,
@@ -130,14 +154,14 @@ class SemanticValidator:
         # Check created_at timestamp
         created_at = provenance.get("created_at")
         if created_at:
-            SemanticValidator._validate_timestamp(
+            self._validate_timestamp(
                 created_at, "created_at", scd_id, result, file_path
             )
 
         # Check updated_at timestamp if present
         updated_at = provenance.get("updated_at")
         if updated_at:
-            SemanticValidator._validate_timestamp(
+            self._validate_timestamp(
                 updated_at, "updated_at", scd_id, result, file_path
             )
 
@@ -153,8 +177,8 @@ class SemanticValidator:
                 )
             )
 
-    @staticmethod
     def _validate_timestamp(
+        self,
         timestamp: str, field_name: str, scd_id: str, result: ValidationResult, file_path: str | None
     ) -> None:
         """Validate timestamp is ISO8601 format."""
@@ -169,25 +193,27 @@ class SemanticValidator:
                 )
             )
 
-    @staticmethod
-    def _validate_id_format(scd_id: str, result: ValidationResult, file_path: str | None) -> None:
+    def _validate_id_format(self, scd_id: str, result: ValidationResult, file_path: str | None) -> None:
         """Validate ID follows proper format."""
-        # Pattern: scd:<tier>:<name>
-        # tier: meta, project, standards
-        # name: alphanumeric, dots, underscores, hyphens
-        pattern = r"^scd:(meta|project|standards):[a-zA-Z0-9._-]+$"
+        # Get pattern from rules
+        id_pattern = self.rules.get("id_pattern", {}).get("pattern")
+        if not id_pattern:
+            # Fallback pattern
+            id_pattern = r"^scd:(meta|project|standards):[a-zA-Z0-9._-]+$"
 
-        if not re.match(pattern, scd_id):
+        if not re.match(id_pattern, scd_id):
+            error_msg = self.rules_loader.get_error_message(
+                self.rules,
+                "invalid_id_format",
+                scd_id=scd_id,
+                pattern=id_pattern,
+            )
             result.add_error(
-                ValidationError(
-                    f"ID '{scd_id}' does not match required pattern 'scd:<tier>:<name>'",
-                    scd_id=scd_id,
-                    file_path=file_path,
-                )
+                ValidationError(error_msg, scd_id=scd_id, file_path=file_path)
             )
 
-    @staticmethod
     def _validate_required_strings(
+        self,
         scd: Dict[str, Any], scd_id: str, result: ValidationResult, file_path: str | None
     ) -> None:
         """Validate required string fields are not empty."""

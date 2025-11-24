@@ -295,6 +295,204 @@ The **SCD-META** specification defines 7 relationship types that SCDs can use to
 - Harder to reason about
 - Could cause runtime issues
 
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### 1. Relationship Types - KEEP CURRENT 7
+
+**Decision**: Keep the 7 existing relationship types. No additions for v0.1.
+
+**The 7 types:**
+1. **depends-on** - This SCD requires another SCD
+2. **satisfies** - This SCD fulfills requirements from another SCD
+3. **constrains** - This SCD imposes constraints on another SCD
+4. **refines** - This SCD provides more detail for another SCD
+5. **extends** - This SCD builds upon another SCD
+6. **conflicts-with** - This SCD has conflicts with another SCD
+7. **implements** - This SCD implements specifications from another SCD
+
+**Deferred additions**: replaces, derives-from, validates, maps-to, requires-approval-from, informs, contradicts
+- Can be added in future versions based on real usage patterns
+- Projects can use existing types as workarounds for now
+
+**Rationale**: Current 7 are comprehensive for most use cases. Don't over-specify before seeing real-world usage.
+
+---
+
+### 2. Relationship Directionality - ALL DIRECTIONAL
+
+**Decision**: All relationships are directional (source → target).
+
+**Example:**
+```yaml
+# In scd:project:auth
+relationships:
+  - type: depends-on
+    target: scd:meta:roles
+    description: "Auth system depends on role definitions"
+```
+
+This means: `scd:project:auth` → `scd:meta:roles` (directional)
+
+**If bidirectional needed**: Create two relationships
+```yaml
+# In SCD A
+relationships:
+  - type: depends-on
+    target: scd:B
+
+# In SCD B
+relationships:
+  - type: depends-on
+    target: scd:A
+```
+
+**Rationale**: Clear semantics, explicit about dependency direction, easier to validate
+
+**Validator behavior**: Treats all relationships as directional
+
+---
+
+### 3. Tier Constraints - ENFORCED
+
+**Decision**: Enforce tier constraints for relationships via relationship-rules.yaml
+
+**Constraint examples:**
+```yaml
+# relationship-rules.yaml
+relationship_types:
+  - type: "satisfies"
+    allowed_tiers:
+      - from: "project"
+        to: "standards"
+    # Project satisfies standards (compliance)
+    # NOT allowed: meta → standards, standards → project
+
+  - type: "depends-on"
+    allowed_tiers:
+      - from: "project"
+        to: ["meta", "project"]
+      - from: "standards"
+        to: ["meta", "standards"]
+      - from: "meta"
+        to: ["meta"]
+    # Layers depend on same level or foundation
+    # NOT allowed: standards → project, meta → standards
+
+  - type: "implements"
+    allowed_tiers:
+      - from: "project"
+        to: ["project", "standards"]
+    # Project implements project specs or standards
+```
+
+**Rationale**: Prevents nonsensical relationships, enforces architectural layering
+
+**Validator behavior**: ERROR if relationship violates tier constraints
+
+---
+
+### 4. Cardinality Limits - NO LIMITS
+
+**Decision**: No limits on number of relationships per SCD.
+
+**Rationale**:
+- Real systems can be complex with many dependencies
+- Don't artificially constrain
+- Can add warnings later if an SCD has excessive relationships (e.g., >50)
+
+**Deferred**: Optional warnings for unusually high relationship counts
+
+---
+
+### 5. Relationship Metadata - KEEP SIMPLE
+
+**Decision**: Relationships have 3 fields only for v0.1.
+
+**Required fields:**
+```yaml
+relationships:
+  - type: "depends-on"        # required
+    target: "scd:meta:roles"  # required
+    description: "Why this relationship exists"  # optional but recommended
+```
+
+**No additional fields**: strength, version_constraint, validated, rationale, etc.
+- Can be added in future versions if needed
+- Keep it simple for v0.1
+
+**Rationale**: Don't over-engineer. See what community needs before adding complexity.
+
+---
+
+### 6. Relationship Validation - LEVEL 4
+
+**Decision**: Validate relationships at Level 4 with these checks:
+
+**Validation rules:**
+```yaml
+relationship_validation:
+  - check: "target_exists"
+    severity: "error"
+    description: "Relationship target SCD must exist in loaded bundles"
+    applies_to: "all"
+
+  - check: "tier_constraints"
+    severity: "error"
+    description: "Relationship must follow tier constraint rules"
+    applies_to: "all"
+
+  - check: "no_self_reference"
+    severity: "error"
+    description: "SCD cannot have relationship to itself"
+    applies_to: "all"
+
+  - check: "acyclic_depends_on"
+    severity: "warning"
+    description: "Circular depends-on relationships detected"
+    applies_to: ["depends-on"]
+    note: "A → B → C → A creates circular dependency"
+```
+
+**Validator behavior:**
+- When validating standalone bundle: WARN if relationship target not in bundle (may be in another bundle)
+- When validating complete project bundle: ERROR if relationship target doesn't exist anywhere
+- ERROR if tier constraints violated
+- ERROR if self-reference detected
+- WARNING if circular depends-on detected
+
+**Rationale**: Comprehensive validation prevents broken references and architectural violations
+
+---
+
+### Summary: Relationship Rules for v0.1
+
+**Implemented:**
+1. ✅ 7 relationship types (depends-on, satisfies, constrains, refines, extends, conflicts-with, implements)
+2. ✅ All relationships directional
+3. ✅ Tier constraints enforced via relationship-rules.yaml
+4. ✅ No cardinality limits
+5. ✅ Simple metadata: type, target, description
+6. ✅ Level 4 validation: target exists, tier constraints, no self-ref, warn on cycles
+
+**Validator implementation:**
+- Loads relationship types from `relationship-rules.yaml`
+- Validates at Level 4 (Relationship Validation)
+- Enforces tier constraints
+- Detects circular dependencies
+- Cross-bundle relationship resolution
+
+**Deferred to future versions:**
+- Additional relationship types (replaces, validates, maps-to, etc.)
+- Relationship metadata (strength, version constraints, etc.)
+- Cardinality warnings
+
+---
+
 ## How to Provide Feedback
 
 Please comment with:

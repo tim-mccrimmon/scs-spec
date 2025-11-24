@@ -190,7 +190,7 @@ content:
 
   domain_bundle_requirements:
     minimum_domains: 10
-    minimum_scds_per_domain: 1
+    minimum_scds_per_domain: 2
     import_constraint: "Domain bundles MUST NOT import other bundles (imports: [])"
     scd_tier_constraint: "Domain bundles contain only project-tier SCDs"
     versioning: "Domain bundles MAY version independently"

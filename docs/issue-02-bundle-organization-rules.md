@@ -214,6 +214,157 @@ Project Bundle (top-level)
 - Limits flexibility
 - Organizational overhead
 
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### Core Architectural Rule: Bundles XOR SCDs
+
+**Decision**: A bundle can contain imports (references to other bundles) OR scds (references to SCDs), but not both.
+
+**Rationale**:
+- Cleaner architecture with clear separation between aggregators and containers
+- Simplifies mental model: bundles are either leaf nodes (contain SCDs) or branch nodes (organize bundles)
+- Consistent pattern across all bundle types
+
+**Bundle hierarchy becomes tree-like:**
+- **Leaf bundles** (have SCDs, no imports): Meta bundles, Domain bundles, Leaf standards bundles
+- **Branch bundles** (have imports, no SCDs): Project bundles, Aggregator standards bundles
+
+---
+
+### 1. Project Bundle Content - IMPORTS ONLY
+
+**Decision**: Project bundles MUST have empty `scds` array. They organize via `imports` only.
+
+```yaml
+# Valid project bundle
+id: bundle:my-project
+type: project
+imports: [bundle:meta:1.0.0, bundle:architecture:1.0.0, ...]
+scds: []  # Must be empty
+```
+
+**Validator behavior**: ERROR if project bundle contains SCDs
+
+---
+
+### 2. Domain Bundle Import Restriction - STRICT NO IMPORTS
+
+**Decision**: Domain bundles MUST NOT import other bundles. They are leaf nodes that contain SCDs only.
+
+```yaml
+# Valid domain bundle
+id: bundle:architecture
+type: domain
+imports: []  # Must be empty
+scds: [scd:project:system-context, scd:project:tech-stack]
+```
+
+**Rationale**:
+- Enables domain independence and parallel development
+- Clear boundaries between domains
+- No circular dependencies possible
+
+**Validator behavior**: ERROR if domain bundle has imports
+
+---
+
+### 3. Domain Bundle Relationships - ALLOWED
+
+**Decision**: Domain bundles CAN reference SCDs from other domain bundles via relationships.
+
+**Rationale**:
+- Domains do interact in real systems
+- Better traceability across domains
+- Already decided in bundle-implementation-questions-ANSWERED.md
+
+**Validator behavior**:
+- When validating standalone domain bundle: WARN about unresolved cross-bundle relationship targets
+- When validating complete project bundle: ERROR if relationship targets don't exist anywhere in loaded bundles
+
+---
+
+### 4. Minimum Bundle Set - CONFIGURABLE VIA COMPLETENESS RULES
+
+**Decision**: Default completeness rules require all 10 domains. Projects can customize via `.scs/completeness-rules.yaml`
+
+**Default behavior (strict)**:
+- Requires 1 meta bundle
+- Requires 1 standards bundle
+- Requires 10 domain bundles (all prescribed domains)
+- Each domain bundle must have minimum 1 SCD
+- Checks for required SCDs per domain (architecture needs system-context, tech-stack, etc.)
+
+**Customizable**: Projects can relax rules by creating `.scs/completeness-rules.yaml`
+
+**Validator behavior**:
+- Loads completeness rules (project-specific or default)
+- Validates against loaded rules
+- Can skip with `--skip-completeness` flag
+
+---
+
+### 5. Standards Bundle Imports - FOLLOWS XOR RULE
+
+**Decision**: Standards bundles are either aggregators OR containers, not both.
+
+**Option A: Aggregator standards bundle**
+```yaml
+id: bundle:standards
+type: standards
+imports: [bundle:standards:hipaa:1.0.0, bundle:standards:soc2:2023.1]
+scds: []  # Aggregator - no SCDs
+```
+
+**Option B: Leaf standards bundle**
+```yaml
+id: bundle:standards:hipaa
+type: standards
+imports: []  # Leaf - no imports
+scds: [scd:standards:hipaa-privacy-rule, scd:standards:hipaa-security-rule]
+```
+
+**Rationale**: Consistent with XOR rule, enables hierarchical standards composition
+
+**Validator behavior**: ERROR if standards bundle has both imports AND scds
+
+---
+
+### 6. Bundle Uniqueness - GLOBALLY UNIQUE
+
+**Decision**: SCD IDs must be unique across the entire loaded bundle set (project bundle + all imported bundles).
+
+**Rationale**:
+- When all bundles are loaded together, duplicate IDs would be ambiguous
+- Relationships need unambiguous targets
+- Easier reasoning about the complete context
+
+**Validator behavior**: ERROR if duplicate SCD IDs found across loaded bundles
+
+---
+
+### Summary: Structural Changes
+
+**New rules implemented:**
+1. ✅ XOR constraint: Bundles contain (imports XOR scds)
+2. ✅ Project bundles: imports only, no SCDs
+3. ✅ Domain bundles: SCDs only, no imports
+4. ✅ Standards bundles: follows XOR rule (aggregator or leaf)
+5. ✅ Completeness validation: configurable via rules files
+6. ✅ SCD uniqueness: global across all loaded bundles
+
+**Implementation Impact**:
+- Schema updates needed for XOR constraint
+- Bundle-meta.yaml updates needed
+- Completeness rules framework needed
+- Cross-bundle relationship validation needed
+
+---
+
 ## How to Provide Feedback
 
 Please comment with:

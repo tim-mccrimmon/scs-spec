@@ -23,7 +23,7 @@ Production projects **MUST** include these 10 domains:
 
 ### Domain Bundle Requirements
 - **Minimum domains**: 10
-- **Minimum SCDs per domain**: 1
+- **Minimum SCDs per domain**: 2
 - **Import constraint**: Domain bundles MUST NOT import other bundles
 - **SCD tier constraint**: Domain bundles contain only project-tier SCDs
 - **Versioning**: Domain bundles MAY version independently
@@ -175,17 +175,29 @@ Production projects **MUST** include these 10 domains:
 - **Optional**: Projects choose what's relevant
 
 ### 6. Minimum SCDs per Domain
-**Question**: Is requiring 1 SCD per domain sufficient?
+**Question**: Is requiring 2 SCDs per domain sufficient?
 
-**Current Rule**: Minimum 1 SCD per domain
+**Current Rule**: Minimum 2 SCDs per domain
 
 **Implications**:
 
-**1 SCD minimum**
+**2 SCDs minimum (current)**
 **Pros**:
-- Not overly restrictive
+- Ensures more comprehensive coverage
+- Prevents token compliance
+- Forces deeper thinking
+- Better documentation quality
+
+**Cons**:
+- May be too restrictive for simple projects
+- Some domains may legitimately need only 1 SCD
+- More overhead than 1 SCD minimum
+
+**Alternative: 1 SCD minimum**
+**Pros**:
+- More flexible
 - Allows for simple domains
-- Easy to satisfy
+- Easier to satisfy
 - Focuses on domain presence
 
 **Cons**:
@@ -203,16 +215,140 @@ Production projects **MUST** include these 10 domains:
 - Empty domains are meaningless
 - No guarantee of actual content
 
-**Alternative: 2-3 SCD minimum**
+**Alternative: 3+ SCD minimum**
 **Pros**:
-- Ensures more comprehensive coverage
-- Forces deeper thinking
-- Better documentation
+- Even more comprehensive coverage
+- Forces very thorough documentation
+- Higher quality
 
 **Cons**:
-- May be too restrictive
+- Too restrictive for most projects
 - Creates busywork
-- Some domains may legitimately need only 1 SCD
+- May discourage adoption
+
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### 1. Are 10 Domains Too Restrictive? - CONFIGURABLE
+
+**Decision**: Default requires all 10 domains (strict). Projects can customize via completeness rules.
+
+**Implementation**:
+- Default `completeness-rules.yaml` requires all 10 prescribed domains
+- Projects create `.scs/completeness-rules.yaml` to relax requirements
+- Can skip completeness validation with `--skip-completeness` flag
+
+**Rationale**: Provides strict production-ready defaults while allowing flexibility for POCs and experiments
+
+---
+
+### 2. Project Tiers - SINGLE STRICT DEFAULT
+
+**Decision**: Ship with single strict default ruleset. No multiple profiles initially.
+
+**Default completeness rules**:
+- Requires 1 meta bundle
+- Requires 1 standards bundle
+- Requires 10 domain bundles (all prescribed)
+- Checks for recommended SCDs per domain
+
+**Why not multiple profiles?**
+- Simpler for v0.1
+- Users can easily customize their own rules
+- Avoids bikeshedding about tier definitions
+- Can add profiles later if community needs emerge
+
+**Projects that need fewer domains**: Create custom `.scs/completeness-rules.yaml`
+
+---
+
+### 3. Prescribed Domains - KEEP CURRENT 10
+
+**Decision**: Keep the current 10 prescribed domains unchanged.
+
+**The 10 domains:**
+1. Architecture
+2. Security
+3. Performance & Reliability
+4. Usability & Accessibility
+5. Compliance & Governance
+6. Data & Provenance
+7. Testing & Validation
+8. Deployment & Operations
+9. Safety & Risk
+10. Ethics & AI Accountability
+
+**Potential additions deferred**: i18n, Legal, Business Continuity, Integration, Cost Management
+- Can be added by projects as custom domains (projects MAY add beyond 10)
+- Can be added to prescribed list in future versions based on community feedback
+
+**Rationale**: Current 10 provide comprehensive coverage for most projects. Don't expand scope for v0.1.
+
+---
+
+### 4. Domain Granularity - KEEP CURRENT
+
+**Decision**: Keep current domain granularity unchanged.
+
+**No changes to**:
+- "Data & Provenance" (stays combined)
+- "Safety & Risk" (stays combined)
+- "Performance & Reliability" (stays combined)
+- All other domains unchanged
+
+**Rationale**: Can be refined based on community feedback. Not critical for validator implementation.
+
+---
+
+### 5. Domain Relevance - HANDLED BY CUSTOMIZATION
+
+**Decision**: All 10 domains required in default rules. Projects customize for their needs.
+
+**Implementation**:
+- Universal domains (Architecture, Security, Testing, Deployment): Always in default rules
+- Sometimes-relevant domains (Usability, Safety, Ethics): Also in default rules
+- Projects without UIs, AI, or safety concerns: Create custom rules excluding irrelevant domains
+
+**Rationale**: Better to start comprehensive and allow opt-out than try to auto-detect relevance
+
+---
+
+### 6. Minimum SCDs per Domain - 1 SCD MINIMUM
+
+**Decision**: Domain bundles must have minimum 1 SCD (structural rule).
+
+**Changed from**: Originally 2 SCDs minimum (see Issue 02 discussion)
+
+**Rationale**:
+- XOR architecture enables fine-grained bundles
+- Structural minimum of 1 ensures bundle isn't empty
+- Completeness rules define recommended SCDs per domain (guidance, not strict enforcement)
+
+**Validator behavior**: ERROR if domain bundle has 0 SCDs
+
+---
+
+### Summary: Domain Rules for v0.1
+
+**Implemented:**
+1. ✅ Default requires all 10 prescribed domains
+2. ✅ Single strict default ruleset (no tiers/profiles)
+3. ✅ Current 10 domains unchanged
+4. ✅ Current domain granularity unchanged
+5. ✅ Projects customize via `.scs/completeness-rules.yaml`
+6. ✅ Minimum 1 SCD per domain bundle (structural)
+7. ✅ Recommended SCDs per domain (in completeness rules)
+
+**Deferred to community feedback:**
+- Additional prescribed domains (i18n, legal, etc.)
+- Domain granularity changes
+- Multiple default profiles/tiers
+
+---
 
 ## How to Provide Feedback
 

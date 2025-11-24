@@ -279,6 +279,248 @@ The **meta bundle** is special - it's provided by SCS-Spec and defines the speci
 - Harder to support
 - Unclear requirements
 
+---
+
+## ✅ DECISIONS MADE FOR v0.1 IMPLEMENTATION
+
+**Date**: 2025-11-24
+**Status**: Decided for initial validator implementation
+
+### 1. Meta Bundle Versioning Cadence - ALIGNED WITH SCS SPEC
+
+**Decision**: Meta bundle version matches SCS specification version.
+
+**Versioning scheme:**
+- SCS 0.1 → `bundle:meta:0.1.0`
+- SCS 0.2 → `bundle:meta:0.2.0`
+- SCS 1.0 → `bundle:meta:1.0.0`
+
+**Example:**
+```yaml
+# For SCS version 0.1
+id: bundle:meta
+type: meta
+version: "0.1.0"
+title: "SCS Meta-Tier Standard Bundle"
+```
+
+**Rationale**:
+- Clear alignment: "I'm using SCS 0.1, so I use meta bundle 0.1.0"
+- Meta bundle IS the spec language definition
+- One version to track (not separate from spec)
+- Easy to understand and communicate
+
+**Version format**: `MAJOR.MINOR.PATCH` matching SCS spec version
+
+---
+
+### 2. Project Version Pinning - SPECIFIC VERSION
+
+**Decision**: Projects pin to specific meta bundle version.
+
+**Project bundle must specify exact version:**
+```yaml
+# Project bundle
+id: bundle:my-project
+type: project
+imports:
+  - bundle:meta:0.1.0  # Specific version (required)
+  - bundle:standards:1.0.0
+  - bundle:architecture:1.0.0
+```
+
+**NOT allowed:**
+- `bundle:meta:0.x` (no range)
+- `bundle:meta:latest` (no latest)
+- `bundle:meta` (no version)
+
+**Rationale**:
+- Stability and reproducibility
+- Project controls when to upgrade
+- No surprise changes
+- Schema enforces version in import pattern
+
+**Validator behavior**: ERROR if meta bundle import lacks specific version
+
+---
+
+### 3. Backward Compatibility - STRICT SEMANTIC VERSIONING
+
+**Decision**: Meta bundle follows strict semantic versioning.
+
+**Version changes:**
+- **Patch** (0.1.0 → 0.1.1): Bug fixes, typos, documentation only
+  - Example: Fix typo in domain-meta.yaml
+  - Backward compatible: YES
+
+- **Minor** (0.1.0 → 0.2.0): New features, backward compatible
+  - Example: Add new relationship type, add new validation level
+  - Backward compatible: YES
+  - Projects on 0.1.0 continue working
+
+- **Major** (0.1.0 → 1.0.0): Breaking changes
+  - Example: Change ID pattern, remove bundle type, change required fields
+  - Backward compatible: NO
+  - Projects must update
+
+**Examples of changes:**
+| Change | Version Impact | Compatible? |
+|--------|---------------|-------------|
+| Fix typo in description | Patch (0.1.0 → 0.1.1) | Yes |
+| Add new relationship type | Minor (0.1.0 → 0.2.0) | Yes |
+| Add new prescribed domain | Minor (0.1.0 → 0.2.0) | Yes |
+| Add optional field to SCD | Minor (0.1.0 → 0.2.0) | Yes |
+| Change ID pattern | Major (0.1.0 → 1.0.0) | No |
+| Remove bundle type | Major (0.1.0 → 1.0.0) | No |
+| Change required fields | Major (0.1.0 → 1.0.0) | No |
+
+**Rationale**: Standard semver is well-understood and predictable
+
+---
+
+### 4. Upgrade Path - MANUAL FOR v0.1
+
+**Decision**: Manual upgrade process for v0.1. Automated tooling deferred to future versions.
+
+**Upgrade process:**
+```bash
+# Step 1: Update project bundle
+# Change: bundle:meta:0.1.0 → bundle:meta:0.2.0
+
+# Step 2: Validate
+scs-validate --bundle bundles/project-bundle.yaml
+
+# Step 3: Fix any breaking changes (if major version)
+
+# Step 4: Commit
+git add bundles/project-bundle.yaml
+git commit -m "Upgrade to meta bundle 0.2.0"
+```
+
+**Future tooling** (post-v0.1):
+```bash
+# Automated upgrade tool (future)
+scs-upgrade --from 0.1.0 --to 0.2.0
+# Tool analyzes changes, suggests fixes, optionally auto-migrates
+```
+
+**Rationale**: Keep validator simple for v0.1. Add upgrade tooling when community needs emerge.
+
+**Deferred**: Automated migration tool, upgrade analysis, breaking change reports
+
+---
+
+### 5. Individual Meta SCD Versioning - TRACKED BUT BUNDLE IS CANONICAL
+
+**Decision**: Both bundle and individual SCD versions exist. Bundle version is what matters.
+
+**Structure:**
+```yaml
+# bundle:meta:0.1.0
+id: bundle:meta
+version: "0.1.0"  # ← Bundle version (canonical)
+
+scds:
+  - scd:meta:scd-meta          # version: "0.1.0"
+  - scd:meta:bundle-meta       # version: "0.1.0"
+  - scd:meta:domain-meta       # version: "0.1.0"
+  - scd:meta:validator-meta    # version: "0.1.0"
+
+# All META SCDs version together with bundle
+```
+
+**Version synchronization:**
+- When meta bundle updates to 0.2.0, all META SCDs update to 0.2.0
+- Individual SCD versions track history
+- Bundle version is what projects reference
+
+**Rationale**:
+- Simpler reasoning: "I'm on meta bundle 0.1.0" vs tracking 4 SCD versions
+- Clear compatibility: bundle version determines compatibility
+- Individual versions useful for change tracking
+
+**Validator behavior**: Uses bundle version for compatibility checking
+
+---
+
+### 6. Version Checking and Compatibility - WARN ABOUT MISMATCHES
+
+**Decision**: Validator checks meta bundle version and warns about mismatches.
+
+**Validator behavior:**
+```bash
+$ scs-validate --bundle project-bundle.yaml
+
+⚠ Info: Project uses bundle:meta:0.1.0
+⚠ Info: Validator supports bundle:meta:0.1.0 - 0.2.0
+✓ Validation using meta bundle 0.1.0 rules
+
+Summary: No errors
+Status: VALID
+```
+
+**If newer version available:**
+```bash
+$ scs-validate --bundle project-bundle.yaml
+
+⚠ Warning: Project uses bundle:meta:0.1.0
+⚠ Warning: Newer version available: bundle:meta:0.2.0
+⚠ Warning: Consider upgrading for latest features and bug fixes
+   See: https://scs-spec.org/changelog/0.2.0
+
+✓ Validation using meta bundle 0.1.0 rules
+Status: VALID
+```
+
+**If version too old (unsupported):**
+```bash
+$ scs-validate --bundle project-bundle.yaml
+
+✗ Error: Project uses bundle:meta:0.1.0
+✗ Error: Validator requires bundle:meta:0.3.0 or higher
+✗ Error: Please upgrade your meta bundle
+
+Status: FAILED (unsupported version)
+```
+
+**Rationale**: Helpful guidance without blocking valid projects on older versions
+
+---
+
+### Summary: Meta Bundle Versioning for v0.1
+
+**Implemented:**
+1. ✅ Meta bundle version matches SCS spec version (0.1.0, 0.2.0, 1.0.0)
+2. ✅ Projects pin to specific version (`bundle:meta:0.1.0`)
+3. ✅ Strict semantic versioning (patch/minor/major)
+4. ✅ Manual upgrade process (tooling deferred)
+5. ✅ Bundle version is canonical (individual SCD versions tracked)
+6. ✅ Validator warns about version mismatches
+
+**Version lifecycle:**
+```
+SCS 0.1 Released
+  └─ bundle:meta:0.1.0 created
+       └─ Projects use: bundle:meta:0.1.0
+
+SCS 0.2 Released (new features, backward compatible)
+  └─ bundle:meta:0.2.0 created
+       ├─ Existing projects on 0.1.0: continue working
+       └─ New projects: use 0.2.0
+
+SCS 1.0 Released (breaking changes)
+  └─ bundle:meta:1.0.0 created
+       ├─ Projects on 0.x.x: must upgrade
+       └─ Validator may drop support for old versions
+```
+
+**Deferred to future:**
+- Automated upgrade tooling
+- Breaking change analysis
+- Multi-version support in validator
+
+---
+
 ## How to Provide Feedback
 
 Please comment with:

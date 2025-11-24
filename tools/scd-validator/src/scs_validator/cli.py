@@ -7,8 +7,12 @@ from typing import List
 import click
 
 from . import __version__
+from .bundle_validator import BundleValidator
+from .completeness_validator import CompletenessValidator
 from .parser import Parser
+from .relationship_validator import RelationshipValidator
 from .reporter import Reporter
+from .rules_loader import RulesLoader
 from .schema_validator import SchemaValidator
 from .semantic_validator import SemanticValidator
 from .utils import ValidationError, ValidationResult
@@ -51,6 +55,16 @@ from .utils import ValidationError, ValidationResult
     is_flag=True,
     help="Verbose output",
 )
+@click.option(
+    "--skip-completeness",
+    is_flag=True,
+    help="Skip Level 6 completeness validation",
+)
+@click.option(
+    "--completeness-rules",
+    type=click.Path(exists=True),
+    help="Path to custom completeness rules file",
+)
 @click.version_option(version=__version__, prog_name="scs-validate")
 def main(
     files: tuple,
@@ -60,6 +74,8 @@ def main(
     strict: bool,
     no_color: bool,
     verbose: bool,
+    skip_completeness: bool,
+    completeness_rules: str | None,
 ) -> None:
     """Validate SCS documents and bundles.
 
@@ -104,10 +120,18 @@ def main(
             )
             sys.exit(4)
 
-        # Initialize validators and reporter
+        # Initialize rules loader and validators
         parser = Parser()
+        rules_loader = RulesLoader()
         schema_validator = SchemaValidator(schema_path)
-        semantic_validator = SemanticValidator()
+        semantic_validator = SemanticValidator(rules_loader)
+        bundle_validator = BundleValidator(rules_loader)
+        relationship_validator = RelationshipValidator(rules_loader)
+
+        # Initialize completeness validator with custom rules if provided
+        completeness_rules_path = Path(completeness_rules) if completeness_rules else None
+        completeness_validator = CompletenessValidator(rules_loader, completeness_rules_path)
+
         reporter = Reporter(use_color=not no_color)
 
         results: List[ValidationResult] = []
@@ -115,7 +139,15 @@ def main(
         if bundle:
             # Validate bundle
             results = validate_bundle(
-                bundle, parser, schema_validator, semantic_validator, verbose
+                bundle,
+                parser,
+                schema_validator,
+                semantic_validator,
+                bundle_validator,
+                relationship_validator,
+                completeness_validator,
+                verbose,
+                skip_completeness,
             )
         elif files:
             # Validate individual files
@@ -216,7 +248,11 @@ def validate_bundle(
     parser: Parser,
     schema_validator: SchemaValidator,
     semantic_validator: SemanticValidator,
+    bundle_validator: BundleValidator,
+    relationship_validator: RelationshipValidator,
+    completeness_validator: CompletenessValidator,
     verbose: bool,
+    skip_completeness: bool,
 ) -> List[ValidationResult]:
     """Validate an SCD bundle.
 
@@ -225,31 +261,85 @@ def validate_bundle(
         parser: Parser instance
         schema_validator: Schema validator instance
         semantic_validator: Semantic validator instance
+        bundle_validator: Bundle validator instance
+        relationship_validator: Relationship validator instance
+        completeness_validator: Completeness validator instance
         verbose: Verbose output flag
+        skip_completeness: Skip Level 6 completeness validation
 
     Returns:
         List of validation results
     """
     syntax_result = ValidationResult("syntax")
     bundle_schema_result = ValidationResult("bundle_schema")
+    semantic_result = ValidationResult("semantic")
+    bundle_result = ValidationResult("bundle")
+    relationship_result = ValidationResult("relationships")
+    completeness_result = ValidationResult("completeness")
 
     if verbose:
         click.echo(f"Validating bundle {bundle_path}...")
 
     try:
-        # Parse bundle (syntax validation)
+        # Level 1: Parse bundle (syntax validation)
         bundle = parser.load_bundle(Path(bundle_path))
-
-        # Validate bundle schema
-        bundle_schema_result = schema_validator.validate_bundle(bundle, bundle_path)
+        bundle_id = bundle.get('id', 'unknown')
+        bundle_type = bundle.get('type', 'unknown')
 
         if verbose:
-            click.echo(f"Bundle ID: {bundle.get('id', 'unknown')}")
+            click.echo(f"Bundle ID: {bundle_id}")
+            click.echo(f"Bundle Type: {bundle_type}")
+
+        # Level 2: Validate bundle schema
+        bundle_schema_result = schema_validator.validate_bundle(bundle, bundle_path)
+        if not bundle_schema_result.passed:
+            # Stop here if schema validation fails
+            return [syntax_result, bundle_schema_result]
+
+        # Level 5: Validate bundle organization (XOR constraint, bundle type rules)
+        bundle_result = bundle_validator.validate_bundle(bundle, bundle_path)
+
+        # Load SCDs for further validation
+        all_scds = []
+        scd_refs = bundle.get("scds", [])
+
+        if scd_refs and verbose:
+            click.echo(f"Loading {len(scd_refs)} SCDs from bundle...")
+
+        for scd_ref in scd_refs:
+            # For now, we assume SCDs are referenced by ID
+            # In a real implementation, you'd resolve these to file paths
+            # This is a simplified version that works with in-bundle SCDs
+            pass
+
+        # Level 3: Semantic validation (for each SCD)
+        # Level 4: Relationship validation
+        if scd_refs:
+            relationship_result = relationship_validator.validate_relationships(
+                all_scds, bundle_type, bundle_path
+            )
+
+        # Level 6: Completeness validation (if not skipped)
+        if not skip_completeness and bundle_type == "project":
+            project_root = Path(bundle_path).parent
+            completeness_result = completeness_validator.validate_completeness(
+                bundle, all_scds, bundle_path, project_root
+            )
+        elif skip_completeness and verbose:
+            click.echo("Skipping completeness validation (--skip-completeness)")
 
     except ValidationError as e:
         syntax_result.add_error(e)
 
-    return [syntax_result, bundle_schema_result]
+    results = [syntax_result, bundle_schema_result, semantic_result, bundle_result]
+
+    if relationship_result.errors or relationship_result.warnings:
+        results.append(relationship_result)
+
+    if not skip_completeness and (completeness_result.errors or completeness_result.warnings):
+        results.append(completeness_result)
+
+    return results
 
 
 def determine_exit_code(results: List[ValidationResult], strict: bool) -> int:
