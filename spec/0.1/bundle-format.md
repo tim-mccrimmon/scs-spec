@@ -144,7 +144,7 @@ scds:
 
 **Type**: `domain`
 **Purpose**: Context for a specific domain or concern area
-**Cardinality**: 10+ per project (minimum 10 prescribed domains)
+**Cardinality**: 11+ per project (minimum 11 prescribed domains)
 **Imports**: MUST NOT import other bundles
 **SCDs**: MUST contain at least 2 project-tier SCDs
 

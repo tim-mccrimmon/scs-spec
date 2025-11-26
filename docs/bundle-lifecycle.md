@@ -265,7 +265,7 @@ imports:
   - bundle:meta:1.0.0
   - bundle:standards:1.0.0
 
-  # Domain bundles (10 prescribed)
+  # Domain bundles (11 prescribed)
   - bundle:architecture:1.0.0
   - bundle:security:1.0.0
   - bundle:performance-reliability:1.0.0

@@ -53,7 +53,7 @@ Let's analyze the current rules by restrictiveness:
 - Project bundle MUST import meta, standards, and domain bundles
 
 **From DOMAIN-META**:
-- Production projects MUST include 10 prescribed domains
+- Production projects MUST include 11 prescribed domains
 
 **From VALIDATOR-META**:
 - Levels 1-5 are ERROR severity (not configurable)
@@ -259,7 +259,7 @@ Let's analyze different use cases:
 - Flexible
 
 **Current Fit**:
-- ❌ 10 domains feels like overkill
+- ❌ 11 domains feels like overkill
 - ❌ Meta/standards/domain bundle hierarchy is complex
 - ✅ Structure is helpful
 
@@ -275,7 +275,7 @@ Let's analyze different use cases:
 - Room to grow
 
 **Current Fit**:
-- ⚠️ 10 domains is manageable but feels heavy early
+- ⚠️ 11 domains is manageable but feels heavy early
 - ✅ Bundle organization makes sense
 - ✅ Validation levels are helpful
 
@@ -291,7 +291,7 @@ Let's analyze different use cases:
 - Collaboration
 
 **Current Fit**:
-- ✅ 10 domains ensure coverage
+- ✅ 11 domains ensure coverage
 - ✅ Bundle structure supports team independence
 - ✅ Validation enforces quality
 
@@ -406,7 +406,7 @@ All META SCDs are affected by this issue:
 - ✅ Bundle type constraints (domain bundles: no imports, etc.)
 
 **Completeness rules (strict by default):**
-- ✅ 10 prescribed domains required
+- ✅ 11 prescribed domains required
 - ✅ Minimum 1 SCD per domain
 - ✅ Recommended SCDs per domain checked
 - ✅ Compliance validation errors by default
@@ -454,7 +454,7 @@ scs-validate --bundle bundle.yaml --strict
 - **Flexible**: Completeness customizable, cross-domain relationships allowed
 
 ### From Issue 03 (Domain Requirements):
-- **Strict**: 10 domains by default, 1 SCD minimum
+- **Strict**: 11 domains by default, 1 SCD minimum
 - **Flexible**: Custom completeness rules, can add custom domains
 
 ### From Issue 04 (Validation Rules):
@@ -519,7 +519,7 @@ scs-validate --bundle bundle.yaml --strict
 ### 1. Opinionated Defaults
 **Philosophy**: Make the right thing easy, the wrong thing hard (but not impossible)
 
-**Example**: Default completeness rules require all 10 domains
+**Example**: Default completeness rules require all 11 domains
 - Encourages comprehensive documentation
 - But projects can opt-out if truly not applicable
 
@@ -545,7 +545,7 @@ scs-validate --bundle bundle.yaml --strict
 **Example**: Project lifecycle
 - Week 1: Skip completeness, focus on architecture
 - Month 1: Add custom completeness rules (3 domains)
-- Month 3: Adopt default rules (10 domains)
+- Month 3: Adopt default rules (11 domains)
 - Production: Strict validation in CI/CD
 
 ---

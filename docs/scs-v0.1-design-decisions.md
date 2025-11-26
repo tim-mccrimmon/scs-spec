@@ -312,9 +312,9 @@ relationships:
 
 ### 1. Prescribed Domains - 10 REQUIRED BY DEFAULT
 
-**Rule**: Default completeness rules require all 10 prescribed domains
+**Rule**: Default completeness rules require all 11 prescribed domains
 
-**The 10 prescribed domains:**
+**The 11 prescribed domains:**
 1. **Architecture** - System structure, components, boundaries
 2. **Security** - Threat models, auth, data protection
 3. **Performance & Reliability** - Performance, scalability, availability
@@ -328,7 +328,7 @@ relationships:
 
 **Customization**: Projects can create `.scs/completeness-rules.yaml` to require fewer domains
 
-**Validator behavior**: ERROR (by default) if project doesn't have all 10 domains
+**Validator behavior**: ERROR (by default) if project doesn't have all 11 domains
 
 ---
 
@@ -360,7 +360,7 @@ relationships:
 
 ### 4. Completeness Validation - CONFIGURABLE
 
-**Default behavior**: Strict validation requiring all 10 domains
+**Default behavior**: Strict validation requiring all 11 domains
 
 **Customization paths:**
 1. **Project-specific rules**: Create `.scs/completeness-rules.yaml`

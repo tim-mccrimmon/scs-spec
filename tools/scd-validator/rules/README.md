@@ -45,7 +45,7 @@ v0.1.0/
 - Target existence validation
 
 **completeness-rules.yaml**
-- 10 prescribed domains
+- 11 prescribed domains
 - Recommended SCDs per domain
 - Stub detection
 - Compliance validation

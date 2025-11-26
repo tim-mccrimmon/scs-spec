@@ -1,12 +1,12 @@
-# Completeness Validation Rules v0.1.0
+# Completeness Validation Rules v0.2.0
 #
 # Default strict completeness rules for production projects
 # Projects can customize by creating .scs/completeness-rules.yaml
 # Based on decisions documented in docs/scs-v0.1-design-decisions.md
 
-version: "0.1.0"
+version: "0.2.0"
 description: "Default strict completeness rules for production SCS projects"
-profile: "comprehensive"  # Requires all 10 prescribed domains
+profile: "comprehensive"  # Requires all 11 prescribed domains
 
 # Validation Level 6: Completeness/Compliance
 level: 6
@@ -24,9 +24,10 @@ required_bundles:
     min: 1  # At least 1, but can have more
 
   - type: "domain"
-    count: 10
-    message: "Project must have exactly 10 domain bundles (prescribed domains)"
-    required_domains:  # The 10 prescribed domains
+    count: 11
+    message: "Project must have exactly 11 domain bundles (prescribed domains)"
+    required_domains:  # The 11 prescribed domains
+      - business-context
       - architecture
       - security
       - performance-reliability
@@ -38,8 +39,50 @@ required_bundles:
       - safety-risk
       - ethics-ai-accountability
 
-# The 10 Prescribed Domains (detailed)
+# The 11 Prescribed Domains (detailed)
 required_domains:
+  - id: "business-context"
+    name: "Business Context"
+    description: "Foundational business and product context (problem, stakeholders, objectives, opportunity)"
+    minimum_scds: 1
+
+    recommended_scds:
+      - pattern: "problem|problem-definition|root-cause"
+        name: "Problem definition"
+        description: "Core problem, affected populations, pain points, root causes"
+        severity: "warning"
+
+      - pattern: "stakeholder|stakeholders"
+        name: "Stakeholder analysis"
+        description: "Stakeholder groups, roles, needs, goals, constraints"
+        severity: "warning"
+
+      - pattern: "business-objective|objectives|goals"
+        name: "Business objectives"
+        description: "Strategic objectives, measurable outcomes, KPIs"
+        severity: "warning"
+
+      - pattern: "opportunity|market|opportunity-analysis"
+        name: "Opportunity analysis"
+        description: "Market context, competitive landscape, why now"
+        severity: "warning"
+
+      - pattern: "constraint|assumptions|constraints-and-assumptions"
+        name: "Constraints and assumptions"
+        description: "Non-technical constraints, organizational boundaries, key assumptions"
+        severity: "warning"
+
+      - pattern: "success|kpi|metrics|success-criteria"
+        name: "Success criteria"
+        description: "Measurable success indicators and KPIs"
+        severity: "warning"
+
+    key_concerns:
+      - "Problem definition"
+      - "Stakeholder alignment"
+      - "Business value"
+      - "Success measurement"
+
   - id: "architecture"
     name: "Architecture"
     description: "System structure, components, boundaries, and technical design"

@@ -1,16 +1,16 @@
 # ================================================================
 # META SCD: DOMAIN-META
 # ================================================================
-# Defines the 10 prescribed domains that organize project-tier SCDs
+# Defines the 11 prescribed domains that organize project-tier SCDs
 # and ensure comprehensive system coverage.
 # ================================================================
 
 id: scd:meta:domain-meta
 type: meta
 title: "Domain Organization and Prescribed Domains"
-version: "0.1.0"
+version: "0.2.0"
 description: >
-  Defines the concept of domains in SCS, the 10 prescribed domains that
+  Defines the concept of domains in SCS, the 11 prescribed domains that
   production projects MUST include, what each domain covers, and when to
   add additional domains.
 
@@ -18,16 +18,38 @@ content:
   definition:
     what: >
       Domains are organizational categories that group related concerns and
-      context. SCS prescribes 10 minimum domains that production projects
+      context. SCS prescribes 11 minimum domains that production projects
       MUST include to ensure comprehensive system coverage.
     purpose: >
       Domains provide a structured way to organize project-tier SCDs, enable
       parallel team development, and ensure no critical concerns are overlooked.
     domain_bundles: >
-      Each domain is represented by a domain bundle containing 2+ project-tier SCDs
+      Each domain is represented by a domain bundle containing 1+ project-tier SCDs
       that address that domain's concerns.
 
   prescribed_domains:
+    - id: domain:business-context
+      name: "Business Context"
+      description: >
+        Foundational business and product context including problem definition,
+        stakeholders, business objectives, opportunity analysis, constraints,
+        and success criteria. Provides the "what/why/who" foundation that all
+        other domains depend on. This domain should be completed first as it
+        establishes the business rationale and context for technical decisions.
+      typical_scds:
+        - "Problem definition and root cause analysis"
+        - "Stakeholder analysis and needs"
+        - "Business objectives and KPIs"
+        - "Opportunity analysis and market context"
+        - "Constraints and assumptions"
+        - "Success criteria and metrics"
+      key_concerns:
+        - "Problem definition"
+        - "Stakeholder needs"
+        - "Business objectives"
+        - "Value proposition"
+        - "Success criteria"
+
     - id: domain:architecture
       name: "Architecture"
       description: >
@@ -189,15 +211,15 @@ content:
         - "Human oversight"
 
   domain_bundle_requirements:
-    minimum_domains: 10
-    minimum_scds_per_domain: 2
+    minimum_domains: 11
+    minimum_scds_per_domain: 1
     import_constraint: "Domain bundles MUST NOT import other bundles (imports: [])"
     scd_tier_constraint: "Domain bundles contain only project-tier SCDs"
     versioning: "Domain bundles MAY version independently"
 
   when_to_add_domains:
     guidance: >
-      Projects MAY add additional domain bundles beyond the prescribed 10
+      Projects MAY add additional domain bundles beyond the prescribed 11
       when they have domain-specific concerns not covered by the standard set.
     examples:
       - "Healthcare: Clinical workflows domain"
@@ -220,8 +242,11 @@ provenance:
   created_by: "scs-spec-maintainers@ohana.ai"
   created_at: "2025-01-23T10:00:00Z"
   updated_by: "scs-spec-maintainers@ohana.ai"
-  updated_at: "2025-01-23T10:00:00Z"
+  updated_at: "2025-01-26T10:00:00Z"
   rationale: >
-    Foundational META SCD defining the 10 prescribed domains that ensure
-    comprehensive system coverage. These domains provide the organizational
-    structure for project-tier SCDs and enable parallel team development.
+    Foundational META SCD defining the 11 prescribed domains that ensure
+    comprehensive system coverage. Added business-context as first domain
+    to provide foundational "what/why/who" context that other domains depend on.
+    Updated minimum SCDs per domain from 2 to 1 to allow fine-grained bundles.
+    These domains provide the organizational structure for project-tier SCDs
+    and enable parallel team development.

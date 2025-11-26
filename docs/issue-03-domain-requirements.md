@@ -2,50 +2,51 @@
 
 ## Overview
 
-The **DOMAIN-META** specification prescribes 10 mandatory domains for production projects. This ensures comprehensive system coverage, but may be too restrictive for certain project types.
+The **DOMAIN-META** specification prescribes 11 mandatory domains for production projects. This ensures comprehensive system coverage, but may be too restrictive for certain project types.
 
 ## Current Rules (from DOMAIN-META)
 
 ### Prescribed Domains
 
-Production projects **MUST** include these 10 domains:
+Production projects **MUST** include these 11 domains:
 
-1. **Architecture** - System structure, components, boundaries
-2. **Security** - Threat models, auth, data protection
-3. **Performance & Reliability** - Performance, scalability, availability
-4. **Usability & Accessibility** - UX, accessibility, interaction patterns
-5. **Compliance & Governance** - Regulatory compliance, audit, governance
-6. **Data & Provenance** - Data models, flow, governance, provenance
-7. **Testing & Validation** - Testing strategy, QA, verification
-8. **Deployment & Operations** - Deployment, monitoring, incident response
-9. **Safety & Risk** - Safety requirements, risk assessment, hazard analysis
-10. **Ethics & AI Accountability** - Ethical considerations, AI governance, bias
+1. **Business Context** - Problem definition, stakeholders, business objectives, opportunity analysis (NEW in v0.2.0 - prerequisite domain)
+2. **Architecture** - System structure, components, boundaries
+3. **Security** - Threat models, auth, data protection
+4. **Performance & Reliability** - Performance, scalability, availability
+5. **Usability & Accessibility** - UX, accessibility, interaction patterns
+6. **Compliance & Governance** - Regulatory compliance, audit, governance
+7. **Data & Provenance** - Data models, flow, governance, provenance
+8. **Testing & Validation** - Testing strategy, QA, verification
+9. **Deployment & Operations** - Deployment, monitoring, incident response
+10. **Safety & Risk** - Safety requirements, risk assessment, hazard analysis
+11. **Ethics & AI Accountability** - Ethical considerations, AI governance, bias
 
 ### Domain Bundle Requirements
-- **Minimum domains**: 10
-- **Minimum SCDs per domain**: 2
+- **Minimum domains**: 11
+- **Minimum SCDs per domain**: 1
 - **Import constraint**: Domain bundles MUST NOT import other bundles
 - **SCD tier constraint**: Domain bundles contain only project-tier SCDs
 - **Versioning**: Domain bundles MAY version independently
 
 ### Additional Domains
-- Projects **MAY** add additional domains beyond the 10
+- Projects **MAY** add additional domains beyond the 11
 
 ## Questions for Community
 
 ### 1. Are 10 Domains Too Restrictive?
-**Question**: Is requiring 10 domains overkill for small/simple projects?
+**Question**: Is requiring 11 domains overkill for small/simple projects?
 
 **Implications**:
 
-**Pros (require 10 domains)**:
+**Pros (require 11 domains)**:
 - Ensures comprehensive coverage
 - Prevents overlooking critical concerns
 - Standard structure across all projects
 - Forces thoughtful consideration
 - Better for governance and compliance
 
-**Cons (require 10 domains)**:
+**Cons (require 11 domains)**:
 - Overhead for small projects
 - Some domains may not be relevant
 - Could discourage adoption
@@ -73,8 +74,8 @@ Production projects **MUST** include these 10 domains:
 - For: Production services, team projects
 - Basic compliance
 
-**Tier 3: Comprehensive (10 domains)**
-- All 10 domains required
+**Tier 3: Comprehensive (11 domains)**
+- All 11 domains required
 - For: Critical systems, regulated industries
 - Full governance and compliance
 
@@ -93,7 +94,7 @@ Production projects **MUST** include these 10 domains:
 - Fragmentation of the standard
 
 ### 3. Are the Prescribed Domains Comprehensive?
-**Question**: Do the 10 domains cover all critical concerns? Are any missing?
+**Question**: Do the 11 domains cover all critical concerns? Are any missing?
 
 **Potential Missing Domains**:
 - **Internationalization (i18n)** - Localization, cultural considerations
@@ -235,7 +236,7 @@ Production projects **MUST** include these 10 domains:
 
 ### 1. Are 10 Domains Too Restrictive? - CONFIGURABLE
 
-**Decision**: Default requires all 10 domains (strict). Projects can customize via completeness rules.
+**Decision**: Default requires all 11 domains (strict). Projects can customize via completeness rules.
 
 **Implementation**:
 - Default `completeness-rules.yaml` requires all 10 prescribed domains
@@ -266,27 +267,28 @@ Production projects **MUST** include these 10 domains:
 
 ---
 
-### 3. Prescribed Domains - KEEP CURRENT 10
+### 3. Prescribed Domains - NOW 11 (UPDATED v0.2.0)
 
-**Decision**: Keep the current 10 prescribed domains unchanged.
+**Decision**: Added business-context as 11th prescribed domain (first in order as prerequisite).
 
-**The 10 domains:**
-1. Architecture
-2. Security
-3. Performance & Reliability
-4. Usability & Accessibility
-5. Compliance & Governance
-6. Data & Provenance
-7. Testing & Validation
-8. Deployment & Operations
-9. Safety & Risk
-10. Ethics & AI Accountability
+**The 11 domains:**
+1. Business Context (NEW in v0.2.0)
+2. Architecture
+3. Security
+4. Performance & Reliability
+5. Usability & Accessibility
+6. Compliance & Governance
+7. Data & Provenance
+8. Testing & Validation
+9. Deployment & Operations
+10. Safety & Risk
+11. Ethics & AI Accountability
 
 **Potential additions deferred**: i18n, Legal, Business Continuity, Integration, Cost Management
-- Can be added by projects as custom domains (projects MAY add beyond 10)
+- Can be added by projects as custom domains (projects MAY add beyond 11)
 - Can be added to prescribed list in future versions based on community feedback
 
-**Rationale**: Current 10 provide comprehensive coverage for most projects. Don't expand scope for v0.1.
+**Rationale**: Business-context was identified as a critical gap - provides foundational "what/why/who" context that all other domains depend on. Testing CEDM Intent phase revealed need for this prerequisite domain.
 
 ---
 
@@ -306,7 +308,7 @@ Production projects **MUST** include these 10 domains:
 
 ### 5. Domain Relevance - HANDLED BY CUSTOMIZATION
 
-**Decision**: All 10 domains required in default rules. Projects customize for their needs.
+**Decision**: All 11 domains required in default rules. Projects customize for their needs.
 
 **Implementation**:
 - Universal domains (Architecture, Security, Testing, Deployment): Always in default rules
@@ -337,7 +339,7 @@ Production projects **MUST** include these 10 domains:
 **Implemented:**
 1. ✅ Default requires all 10 prescribed domains
 2. ✅ Single strict default ruleset (no tiers/profiles)
-3. ✅ Current 10 domains unchanged
+3. ✅ Current 11 domains unchanged
 4. ✅ Current domain granularity unchanged
 5. ✅ Projects customize via `.scs/completeness-rules.yaml`
 6. ✅ Minimum 1 SCD per domain bundle (structural)

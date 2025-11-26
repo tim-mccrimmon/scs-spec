@@ -290,7 +290,7 @@ scds: [scd:project:system-context, scd:project:tech-stack]
 
 ### 4. Minimum Bundle Set - CONFIGURABLE VIA COMPLETENESS RULES
 
-**Decision**: Default completeness rules require all 10 domains. Projects can customize via `.scs/completeness-rules.yaml`
+**Decision**: Default completeness rules require all 11 domains. Projects can customize via `.scs/completeness-rules.yaml`
 
 **Default behavior (strict)**:
 - Requires 1 meta bundle
