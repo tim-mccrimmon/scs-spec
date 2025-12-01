@@ -1,8 +1,8 @@
 # SCS Project Progress Tracker
-# Last Updated: 2025-11-26
+# Last Updated: 2025-11-30
 
 version: "0.2.0"
-last_updated: "2025-11-26"
+last_updated: "2025-11-30"
 project_phase: "intent_phase_templates_and_cli"
 
 # Overall Project Status
@@ -69,8 +69,18 @@ current_sprint:
     - "Successfully tested scs init - creates complete project structure"
     - "Successfully tested scs validate - backward compatible"
 
+    # CLI Bug Fixes & Template System (2025-11-30)
+    - "Fixed missing business-context domain in scs-cli DOMAIN_BUNDLES"
+    - "Created business-context.yaml bundle template"
+    - "Created 6 business-context SCD templates (problem-definition, stakeholders, business-objectives, opportunity-analysis, constraints-and-assumptions, success-criteria)"
+    - "Added business-context to scd_mapping in new.py"
+    - "Implemented domain documentation template copying in _create_domain_docs()"
+    - "Copied all 11 domain markdown templates from scs-spec to scs-cli/templates/docs/"
+    - "Fixed typo: usabiliity-accessibility → usability-accessibility (in both scs-spec and scs-cli)"
+    - "Successfully tested scs new project - now creates all 11 domain bundles, 39+ SCDs, and 11 domain markdown templates"
+
   in_progress:
-    - "Testing complete project initialization workflow"
+    []
 
   next_up:
     - "Implement scs generate command (AI transposer agent)"
