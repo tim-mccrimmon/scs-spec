@@ -274,20 +274,90 @@ def validate_bundle(
 
         # Load SCDs for further validation
         all_scds = []
-        scd_refs = bundle.get("scds", [])
+        scd_refs = []
+
+        # Collect SCD references from bundle and imported bundles
+        bundle_dir = Path(bundle_path).parent
+        # Project root is parent of bundles/ directory
+        project_root = bundle_dir.parent if bundle_dir.name == "bundles" else bundle_dir
+
+        # If this is a project bundle, load domain bundles to get SCD references
+        if bundle_type == "project":
+            imports = bundle.get("imports", [])
+
+            if verbose:
+                click.echo(f"Loading {len(imports)} imported bundles...")
+
+            for import_ref in imports:
+                # Parse bundle reference: bundle:<name>:<version> or bundle:<name>
+                parts = import_ref.split(":")
+                if len(parts) >= 2 and parts[0] == "bundle":
+                    bundle_name = parts[1]
+
+                    # Skip meta and standards bundles for now
+                    if bundle_name in ["meta", "standards"]:
+                        continue
+
+                    # Try to find the domain bundle file
+                    domain_bundle_path = bundle_dir / "domains" / f"{bundle_name}.yaml"
+
+                    if domain_bundle_path.exists():
+                        try:
+                            domain_bundle = parser.load_bundle(domain_bundle_path)
+                            domain_scds = domain_bundle.get("scds", [])
+                            scd_refs.extend(domain_scds)
+
+                            if verbose:
+                                click.echo(f"  Loaded {bundle_name}: {len(domain_scds)} SCDs")
+                        except Exception as e:
+                            if verbose:
+                                click.echo(f"  Warning: Could not load {domain_bundle_path}: {e}")
+                    else:
+                        if verbose:
+                            click.echo(f"  Warning: Domain bundle not found: {domain_bundle_path}")
+        else:
+            # For non-project bundles, use SCDs directly from the bundle
+            scd_refs = bundle.get("scds", [])
 
         if scd_refs and verbose:
-            click.echo(f"Loading {len(scd_refs)} SCDs from bundle...")
+            click.echo(f"Loading {len(scd_refs)} SCDs...")
 
+        # Load each SCD file
         for scd_ref in scd_refs:
-            # For now, we assume SCDs are referenced by ID
-            # In a real implementation, you'd resolve these to file paths
-            # This is a simplified version that works with in-bundle SCDs
-            pass
+            # Resolve SCD reference to file path
+            # Format: scd:project:system-context → context/project/system-context.yaml
+            if scd_ref.startswith("scd:"):
+                parts = scd_ref.split(":", 2)
+                if len(parts) >= 3:
+                    tier = parts[1]  # project, meta, or standards
+                    scd_name = parts[2]
 
-        # Level 3: Semantic validation (for each SCD)
+                    # Construct file path
+                    scd_file = project_root / "context" / tier / f"{scd_name}.yaml"
+
+                    if scd_file.exists():
+                        try:
+                            scd_data = parser.load_scd(scd_file)
+                            all_scds.append(scd_data)
+
+                            # Level 3: Semantic validation for this SCD
+                            result = semantic_validator.validate_scd(scd_data, str(scd_file))
+                            semantic_result.errors.extend(result.errors)
+                            semantic_result.warnings.extend(result.warnings)
+                            if not result.passed:
+                                semantic_result.passed = False
+                        except Exception as e:
+                            if verbose:
+                                click.echo(f"  Warning: Could not load {scd_file}: {e}")
+                    else:
+                        if verbose:
+                            click.echo(f"  Warning: SCD file not found: {scd_file}")
+
+        if verbose:
+            click.echo(f"Successfully loaded {len(all_scds)} SCDs")
+
         # Level 4: Relationship validation
-        if scd_refs:
+        if all_scds:
             relationship_result = relationship_validator.validate_relationships(
                 all_scds, bundle_type, bundle_path
             )

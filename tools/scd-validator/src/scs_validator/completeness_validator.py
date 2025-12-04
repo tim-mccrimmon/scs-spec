@@ -103,14 +103,23 @@ class CompletenessValidator:
         required_bundles = rules.get("required_bundles", [])
         imports = bundle.get("imports", [])
 
-        # Count bundle types
-        bundle_type_counts: Dict[str, int] = {}
+        # Count bundle types by name
+        # For special types (meta, standards), count by name
+        # For domain type, count how many bundles are NOT meta or standards
+        bundle_type_counts: Dict[str, int] = {"meta": 0, "standards": 0, "domain": 0}
+
         for import_ref in imports:
-            # Parse bundle reference: bundle:<type>:<version> or bundle:<type>
+            # Parse bundle reference: bundle:<name>:<version> or bundle:<name>
             parts = import_ref.split(":")
             if len(parts) >= 2 and parts[0] == "bundle":
-                bundle_type = parts[1]
-                bundle_type_counts[bundle_type] = bundle_type_counts.get(bundle_type, 0) + 1
+                bundle_name = parts[1]
+                if bundle_name == "meta":
+                    bundle_type_counts["meta"] += 1
+                elif bundle_name == "standards":
+                    bundle_type_counts["standards"] += 1
+                else:
+                    # Assume any other bundle is a domain bundle
+                    bundle_type_counts["domain"] += 1
 
         # Check requirements
         for req in required_bundles:
@@ -184,15 +193,12 @@ class CompletenessValidator:
         """
         required_domains = rules.get("required_domains", [])
 
-        # Group SCDs by domain (from SCD IDs)
+        # Group SCDs by domain (from SCD domain field)
         domain_scds: Dict[str, List[Dict[str, Any]]] = {}
         for scd in all_scds:
-            scd_id = scd.get("id", "")
-            # Extract domain from ID if it follows pattern scd:project:<domain>.<name>
-            if scd_id.startswith("scd:project:"):
-                name_part = scd_id.split(":", 2)[2]
-                # Get domain (first part before dot or hyphen)
-                domain = name_part.split(".")[0].split("-")[0]
+            # Use the domain field from the SCD itself
+            domain = scd.get("domain")
+            if domain:
                 if domain not in domain_scds:
                     domain_scds[domain] = []
                 domain_scds[domain].append(scd)
